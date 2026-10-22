@@ -36,31 +36,55 @@
     <ClInclude Include="EstadoSolicitud.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ListaBitacora.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListaBodega.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListaCentros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListaCliente.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListaColaborador.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListaPaquete.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListaSolicitud.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PersonaFisica.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TipoBodega.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Nodo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ListaEnlazada.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cliente.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Colaborador.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Celda.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bodega.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegistroBitacora.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Paquete.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tarifas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SolicitudEnvio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CentroDistribucion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reportes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Validador.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SistemaTicoPack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,31 +110,49 @@
     <ClCompile Include="EstadoSolicitud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ListaBitacora.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListaBodega.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListaCentros.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListaCliente.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListaColaborador.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListaPaquete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListaSolicitud.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PersonaFisica.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TipoBodega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cliente.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Colaborador.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Celda.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Bodega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistroBitacora.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Paquete.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tarifas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SolicitudEnvio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CentroDistribucion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Reportes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Validador.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SistemaTicoPack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,11 +3,19 @@
 
 using namespace std;
 
-PersonaFisica::PersonaFisica(string identificacion, string nombre,
-    string telefono, string correo)
+PersonaFisica::PersonaFisica(const string& identificacion, const string& nombre,
+    const string& telefono, const string& correo)
     : Cliente(identificacion, nombre, telefono, correo) {}
 
-void PersonaFisica::mostrarDatos() const {
+double PersonaFisica::calcularCostoFinal(double costoBase) const {
+    return costoBase;
+}
+
+string PersonaFisica::getTipo() const {
+    return "Persona fisica";
+}
+
+void PersonaFisica::mostrar() const {
     cout << "--- PERSONA FISICA ---" << endl;
-    Cliente::mostrarDatos();
+    Cliente::mostrar();
 }

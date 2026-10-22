@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "TicoPack\\x64\\Debug\\CentroDistribucion.obj",
+            "outputs": [
+                "TicoPack\\x64\\Debug\\CentroDistribucion.cpp.obj.dt.module.json",
+                "TicoPack\\x64\\Debug\\CentroDistribucion.cpp.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}
