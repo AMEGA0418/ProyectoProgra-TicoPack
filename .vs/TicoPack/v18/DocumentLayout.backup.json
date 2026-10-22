@@ -3,6 +3,102 @@
   "WorkspaceRootPath": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\TipoBodega.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:TipoBodega.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\PersonaFisica.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:PersonaFisica.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\PersonaFisica.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:PersonaFisica.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaSolicitud.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaSolicitud.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaSolicitud.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaSolicitud.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaPaquete.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaPaquete.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaPaquete.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaPaquete.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaColaborador.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaColaborador.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaColaborador.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaColaborador.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaCliente.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaCliente.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaCliente.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaCliente.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaCentros.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaCentros.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBodega.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaBodega.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBodega.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaBodega.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBitacora.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaBitacora.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBitacora.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:ListaBitacora.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\EstadoSolicitud.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:EstadoSolicitud.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\EstadoPaquete.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:EstadoPaquete.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\EstadoDespacho.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:EstadoDespacho.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Empresa.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:Empresa.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Empresa.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:Empresa.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Despacho.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:Despacho.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Despacho.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:Despacho.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Categoria.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:Categoria.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Fecha.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{DCEA0B2D-D85D-DF95-889D-00A255EE5606}|TicoPack.vcxproj|solutionrelative:Fecha.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -27,19 +123,331 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "TipoBodega.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\TipoBodega.h",
+              "RelativeDocumentMoniker": "TipoBodega.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\TipoBodega.h",
+              "RelativeToolTip": "TipoBodega.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:52:17.714Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PersonaFisica.cpp",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\PersonaFisica.cpp",
+              "RelativeDocumentMoniker": "PersonaFisica.cpp",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\PersonaFisica.cpp",
+              "RelativeToolTip": "PersonaFisica.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-22T19:51:50.695Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PersonaFisica.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\PersonaFisica.h",
+              "RelativeDocumentMoniker": "PersonaFisica.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\PersonaFisica.h",
+              "RelativeToolTip": "PersonaFisica.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:51:26.393Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ListaSolicitud.cpp",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaSolicitud.cpp",
+              "RelativeDocumentMoniker": "ListaSolicitud.cpp",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaSolicitud.cpp",
+              "RelativeToolTip": "ListaSolicitud.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-22T19:50:53.966Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ListaSolicitud.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaSolicitud.h",
+              "RelativeDocumentMoniker": "ListaSolicitud.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaSolicitud.h",
+              "RelativeToolTip": "ListaSolicitud.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADwAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:50:26.882Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ListaPaquete.cpp",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaPaquete.cpp",
+              "RelativeDocumentMoniker": "ListaPaquete.cpp",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaPaquete.cpp",
+              "RelativeToolTip": "ListaPaquete.cpp",
+              "ViewState": "AgIAAGMAAAAAAAAAAAAgwIgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-22T19:49:53.753Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ListaPaquete.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaPaquete.h",
+              "RelativeDocumentMoniker": "ListaPaquete.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaPaquete.h",
+              "RelativeToolTip": "ListaPaquete.h",
+              "ViewState": "AgIAACYAAAAAAAAAAAAgwD8AAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:49:22.599Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ListaColaborador.cpp",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaColaborador.cpp",
+              "RelativeDocumentMoniker": "ListaColaborador.cpp",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaColaborador.cpp",
+              "RelativeToolTip": "ListaColaborador.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-22T19:48:35.294Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ListaColaborador.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaColaborador.h",
+              "RelativeDocumentMoniker": "ListaColaborador.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaColaborador.h",
+              "RelativeToolTip": "ListaColaborador.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADMAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:48:02.813Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ListaCliente.cpp",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaCliente.cpp",
+              "RelativeDocumentMoniker": "ListaCliente.cpp",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaCliente.cpp",
+              "RelativeToolTip": "ListaCliente.cpp",
+              "ViewState": "AgIAAG0AAAAAAAAAAAAAAHsAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-22T19:47:25.966Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ListaCliente.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaCliente.h",
+              "RelativeDocumentMoniker": "ListaCliente.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaCliente.h",
+              "RelativeToolTip": "ListaCliente.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEAAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:47:00.641Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ListaCentros.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaCentros.h",
+              "RelativeDocumentMoniker": "ListaCentros.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaCentros.h",
+              "RelativeToolTip": "ListaCentros.h",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:46:17.836Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "ListaBodega.cpp",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBodega.cpp",
+              "RelativeDocumentMoniker": "ListaBodega.cpp",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBodega.cpp",
+              "RelativeToolTip": "ListaBodega.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAMsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-22T19:45:14.911Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "ListaBodega.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBodega.h",
+              "RelativeDocumentMoniker": "ListaBodega.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBodega.h",
+              "RelativeToolTip": "ListaBodega.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:44:18.586Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "ListaBitacora.cpp",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBitacora.cpp",
+              "RelativeDocumentMoniker": "ListaBitacora.cpp",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBitacora.cpp",
+              "RelativeToolTip": "ListaBitacora.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAMsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-22T19:43:33.252Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "ListaBitacora.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBitacora.h",
+              "RelativeDocumentMoniker": "ListaBitacora.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\ListaBitacora.h",
+              "RelativeToolTip": "ListaBitacora.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADEAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:43:13.042Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "EstadoSolicitud.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\EstadoSolicitud.h",
+              "RelativeDocumentMoniker": "EstadoSolicitud.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\EstadoSolicitud.h",
+              "RelativeToolTip": "EstadoSolicitud.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:42:41.082Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "EstadoPaquete.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\EstadoPaquete.h",
+              "RelativeDocumentMoniker": "EstadoPaquete.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\EstadoPaquete.h",
+              "RelativeToolTip": "EstadoPaquete.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:42:24.931Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "EstadoDespacho.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\EstadoDespacho.h",
+              "RelativeDocumentMoniker": "EstadoDespacho.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\EstadoDespacho.h",
+              "RelativeToolTip": "EstadoDespacho.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:42:01.651Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Empresa.cpp",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Empresa.cpp",
+              "RelativeDocumentMoniker": "Empresa.cpp",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Empresa.cpp",
+              "RelativeToolTip": "Empresa.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-22T19:41:28.697Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "Empresa.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Empresa.h",
+              "RelativeDocumentMoniker": "Empresa.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Empresa.h",
+              "RelativeToolTip": "Empresa.h",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:40:57.077Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "Despacho.cpp",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Despacho.cpp",
+              "RelativeDocumentMoniker": "Despacho.cpp",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Despacho.cpp",
+              "RelativeToolTip": "Despacho.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-22T19:40:20.977Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "Despacho.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Despacho.h",
+              "RelativeDocumentMoniker": "Despacho.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Despacho.h",
+              "RelativeToolTip": "Despacho.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:39:43.482Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "Categoria.h",
+              "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Categoria.h",
+              "RelativeDocumentMoniker": "Categoria.h",
+              "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Categoria.h",
+              "RelativeToolTip": "Categoria.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-22T19:39:08.827Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
               "Title": "Fecha.cpp",
               "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Fecha.cpp",
               "RelativeDocumentMoniker": "Fecha.cpp",
               "ToolTip": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Fecha.cpp",
               "RelativeToolTip": "Fecha.cpp",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAAAEEAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAABAAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-10-22T19:26:31.127Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 25,
               "Title": "Fecha.h",
               "DocumentMoniker": "C:\\Users\\amega\\OneDrive\\Documentos\\GitHub\\ProyectoProgra-ZonaActiva\\ProyectoProgra-TicoPack\\Fecha.h",
               "RelativeDocumentMoniker": "Fecha.h",
@@ -47,8 +455,7 @@
               "RelativeToolTip": "Fecha.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-10-22T19:25:44.78Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-22T19:25:44.78Z"
             }
           ]
         }

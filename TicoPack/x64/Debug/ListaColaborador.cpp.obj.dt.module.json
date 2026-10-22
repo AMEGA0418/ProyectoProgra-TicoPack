@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "TicoPack\\x64\\Debug\\ListaColaborador.obj",
+            "outputs": [
+                "TicoPack\\x64\\Debug\\ListaColaborador.cpp.obj.dt.module.json",
+                "TicoPack\\x64\\Debug\\ListaColaborador.cpp.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}

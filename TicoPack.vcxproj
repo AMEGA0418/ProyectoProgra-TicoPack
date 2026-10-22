@@ -19,10 +19,40 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Categoria.h" />
+    <ClInclude Include="Despacho.h" />
+    <ClInclude Include="Empresa.h" />
+    <ClInclude Include="EstadoDespacho.h" />
+    <ClInclude Include="EstadoPaquete.h" />
+    <ClInclude Include="EstadoSolicitud.h" />
     <ClInclude Include="Fecha.h" />
+    <ClInclude Include="ListaBitacora.h" />
+    <ClInclude Include="ListaBodega.h" />
+    <ClInclude Include="ListaCentros.h" />
+    <ClInclude Include="ListaCliente.h" />
+    <ClInclude Include="ListaColaborador.h" />
+    <ClInclude Include="ListaPaquete.h" />
+    <ClInclude Include="ListaSolicitud.h" />
+    <ClInclude Include="PersonaFisica.h" />
+    <ClInclude Include="TipoBodega.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Categoria.cpp" />
+    <ClCompile Include="Despacho.cpp" />
+    <ClCompile Include="Empresa.cpp" />
+    <ClCompile Include="EstadoDespacho.cpp" />
+    <ClCompile Include="EstadoPaquete.cpp" />
+    <ClCompile Include="EstadoSolicitud.cpp" />
     <ClCompile Include="Fecha.cpp" />
+    <ClCompile Include="ListaBitacora.cpp" />
+    <ClCompile Include="ListaBodega.cpp" />
+    <ClCompile Include="ListaCentros.cpp" />
+    <ClCompile Include="ListaCliente.cpp" />
+    <ClCompile Include="ListaColaborador.cpp" />
+    <ClCompile Include="ListaPaquete.cpp" />
+    <ClCompile Include="ListaSolicitud.cpp" />
+    <ClCompile Include="PersonaFisica.cpp" />
+    <ClCompile Include="TipoBodega.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

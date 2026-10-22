@@ -1,11 +1,4 @@
-#ifndef ESTADOSOLICITUD_H
-#define ESTADOSOLICITUD_H
+#pragma once
+class EstadoSolicitud
+{};
 
-enum EstadoSolicitud {
-    PENDIENTE,
-    APROBADA,
-    RECHAZADA,
-    ANULADA
-};
-
-#endif

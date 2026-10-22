@@ -1,9 +1,4 @@
-#ifndef ESTADODESPACHO_H
-#define ESTADODESPACHO_H
+#pragma once
+class EstadoDespacho
+{};
 
-enum EstadoDespacho {
-    EN_PROCESO,
-    FINALIZADO
-};
-
-#endif

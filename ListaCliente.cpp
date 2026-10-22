@@ -13,8 +13,7 @@ Cliente::Cliente(string identificacion, string nombre,
     this->correo = correo;
 }
 
-Cliente::~Cliente() {
-}
+Cliente::~Cliente() {}
 
 string Cliente::getIdentificacion() const {
     return identificacion;

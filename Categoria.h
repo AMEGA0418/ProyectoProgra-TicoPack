@@ -1,11 +1,4 @@
-#ifndef CATEGORIA_H
-#define CATEGORIA_H
+#pragma once
+class Categoria
+{};
 
-enum Categoria {
-    GENERAL,
-    FRAGIL,
-    TECNOLOGIA,
-    DOCUMENTOS
-};
-
-#endif

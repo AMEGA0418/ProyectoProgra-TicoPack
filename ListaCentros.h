@@ -8,9 +8,8 @@ class Centro {
 
 class NodoCentro {
 private:
-	
+
 };
 class ListaCentros
-{
-};
+{};
 

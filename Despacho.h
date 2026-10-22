@@ -1,7 +1,4 @@
 #pragma once
-#ifndef LISTADESPACHO_H
-#define LISTADESPACHO_H
-//Poner ListaDespacho
 #include <string>
 #include "Fecha.h"
 #include "EstadoDespacho.h"
@@ -60,6 +57,4 @@ public:
     Despacho* buscar(string codigo);
     void mostrar();
 };
-
-#endif
 
