@@ -1,7 +1,2 @@
-﻿  Menu.cpp
-  Reportes.cpp
-  SistemaTicoPack.cpp
-  Validador.cpp
-  Generando código...
-MSVCRTD.lib(exe_main.obj) : error LNK2019: símbolo externo main sin resolver al que se hace referencia en la función "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
+﻿MSVCRTD.lib(exe_main.obj) : error LNK2019: símbolo externo main sin resolver al que se hace referencia en la función "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
 C:\Users\amega\OneDrive\Documentos\GitHub\ProyectoProgra-ZonaActiva\ProyectoProgra-TicoPack\x64\Debug\TicoPack.exe : fatal error LNK1120: 1 externos sin resolver

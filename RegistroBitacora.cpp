@@ -4,8 +4,8 @@
 
 using namespace std;
 
-RegistroBitacora::RegistroBitacora(EstadoPaquete estadoAnterior,
-    EstadoPaquete nuevoEstado,
+RegistroBitacora::RegistroBitacora(int estadoAnterior,
+    int nuevoEstado,
     const Fecha& fechaCambio,
     Colaborador* responsable)
     : fechaCambio(fechaCambio) {
@@ -14,14 +14,14 @@ RegistroBitacora::RegistroBitacora(EstadoPaquete estadoAnterior,
     this->responsable = responsable;
 }
 
-EstadoPaquete RegistroBitacora::getEstadoAnterior() const { return estadoAnterior; }
-EstadoPaquete RegistroBitacora::getNuevoEstado() const { return nuevoEstado; }
+int RegistroBitacora::getEstadoAnterior() const { return estadoAnterior; }
+int RegistroBitacora::getNuevoEstado() const { return nuevoEstado; }
 Fecha RegistroBitacora::getFechaCambio() const { return fechaCambio; }
 Colaborador* RegistroBitacora::getResponsable() const { return responsable; }
 
 void RegistroBitacora::mostrar() const {
-    cout << estadoPaqueteToString(estadoAnterior) << " -> "
-        << estadoPaqueteToString(nuevoEstado)
+    cout << EstadoPaquete::toString(estadoAnterior) << " -> "
+        << EstadoPaquete::toString(nuevoEstado)
         << " | " << fechaCambio.toString() << " " << fechaCambio.horaToString()
         << " | ";
 

@@ -26,7 +26,7 @@ bool Paquete::datosValidos(const string& codigo, const string& descripcion,
 }
 
 Paquete::Paquete(const string& codigo, const string& descripcion, double peso,
-    Categoria categoria, Cliente* propietario, CentroDistribucion* centro) {
+    int categoria, Cliente* propietario, CentroDistribucion* centro) {
     this->codigo = codigo;
     this->descripcion = descripcion;
     this->peso = peso;
@@ -42,8 +42,8 @@ Paquete::Paquete(const string& codigo, const string& descripcion, double peso,
 string Paquete::getCodigo() const { return codigo; }
 string Paquete::getDescripcion() const { return descripcion; }
 double Paquete::getPeso() const { return peso; }
-Categoria Paquete::getCategoria() const { return categoria; }
-EstadoPaquete Paquete::getEstado() const { return estado; }
+int Paquete::getCategoria() const { return categoria; }
+int Paquete::getEstado() const { return estado; }
 Cliente* Paquete::getPropietario() const { return propietario; }
 CentroDistribucion* Paquete::getCentro() const { return centro; }
 Bodega* Paquete::getBodega() const { return bodega; }
@@ -58,17 +58,17 @@ const ListaEnlazada<RegistroBitacora>& Paquete::getBitacora() const {
     return bitacora;
 }
 
-bool Paquete::esTransicionValida(EstadoPaquete nuevo) const {
-    return transicionPaqueteEnTabla(estado, nuevo);
+bool Paquete::esTransicionValida(int nuevo) const {
+    return EstadoPaquete::transicionEnTabla(estado, nuevo);
 }
 
-EstadoPaquete Paquete::getEstadoPreIncidencia() const {
+int Paquete::getEstadoPreIncidencia() const {
     if (estado != EstadoPaquete::INCIDENCIA) {
         return estado;
     }
 
     // El ultimo registro es el que llevo el paquete a INCIDENCIA.
-    EstadoPaquete anterior = estado;
+    int anterior = estado;
     for (Nodo<RegistroBitacora>* n = bitacora.getPrimero(); n != nullptr;
         n = n->getSiguiente()) {
         anterior = n->getDato()->getEstadoAnterior();
@@ -76,17 +76,17 @@ EstadoPaquete Paquete::getEstadoPreIncidencia() const {
     return anterior;
 }
 
-void Paquete::registrarBitacora(EstadoPaquete anterior, EstadoPaquete nuevo,
+void Paquete::registrarBitacora(int anterior, int nuevo,
     Colaborador* responsable, const Fecha& fecha) {
     bitacora.insertarFinal(new RegistroBitacora(anterior, nuevo, fecha, responsable));
 }
 
-bool Paquete::aplicarTransicion(EstadoPaquete nuevo, Colaborador* responsable,
+bool Paquete::aplicarTransicion(int nuevo, Colaborador* responsable,
     const Fecha& fecha) {
     if (responsable == nullptr || !fecha.esValida()) return false;
     if (!esTransicionValida(nuevo)) return false;
 
-    EstadoPaquete anterior = estado;
+    int anterior = estado;
     registrarBitacora(anterior, nuevo, responsable, fecha);
     estado = nuevo;
     return true;
@@ -104,7 +104,7 @@ void Paquete::liberarUbicacion() {
     columna = -1;
 }
 
-bool Paquete::cambiarEstado(EstadoPaquete nuevo, Colaborador* responsable,
+bool Paquete::cambiarEstado(int nuevo, Colaborador* responsable,
     const Fecha& fecha) {
     bool permitido = false;
 
@@ -126,8 +126,8 @@ void Paquete::mostrar() const {
     cout << "Codigo: " << codigo << endl;
     cout << "Descripcion: " << descripcion << endl;
     cout << "Peso: " << peso << " kg" << endl;
-    cout << "Categoria: " << categoriaToString(categoria) << endl;
-    cout << "Estado: " << estadoPaqueteToString(estado) << endl;
+    cout << "Categoria: " << Categoria::toString(categoria) << endl;
+    cout << "Estado: " << EstadoPaquete::toString(estado) << endl;
 
     if (propietario != nullptr) {
         cout << "Propietario: " << propietario->getNombre()

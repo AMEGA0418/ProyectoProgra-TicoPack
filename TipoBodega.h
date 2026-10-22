@@ -1,39 +1,24 @@
 #pragma once
 #include <string>
-#include "Categoria.h"
 
-// Los valores numericos coinciden con la tabla del enunciado.
-enum class TipoBodega {
-    GENERAL = 1,
-    FRAGIL = 2,
-    TECNOLOGIA = 3,
-    DOCUMENTOS = 4
+using namespace std;
+
+// Tipos de bodega. Se guardan como int usando estas constantes. Los valores
+// numericos coinciden con la tabla del enunciado (codigo de tipo 1 a 4).
+class TipoBodega {
+public:
+    static const int GENERAL;
+    static const int FRAGIL;
+    static const int TECNOLOGIA;
+    static const int DOCUMENTOS;
+
+    // true si el codigo es un tipo definido (1 a 4).
+    static bool esValido(int tipo);
+
+    // Texto para mostrar. Si el valor no es valido devuelve "Desconocido".
+    static string toString(int tipo);
+
+    // Compatibilidad directa con la categoria del paquete:
+    // General-General, Fragil-Fragil, Tecnologia-Tecnologia, Documentos-Documentos.
+    static bool esCompatible(int tipo, int categoria);
 };
-
-inline std::string tipoBodegaToString(TipoBodega t) {
-    switch (t) {
-    case TipoBodega::GENERAL:    return "General";
-    case TipoBodega::FRAGIL:     return "Fragil";
-    case TipoBodega::TECNOLOGIA: return "Tecnologia";
-    case TipoBodega::DOCUMENTOS: return "Documentos";
-    }
-    return "Desconocido";
-}
-
-// Codigo de tipo (1 a 4) -> TipoBodega. Devuelve false si el codigo no es valido.
-inline bool tipoBodegaDesdeInt(int codigo, TipoBodega& resultado) {
-    if (codigo < 1 || codigo > 4) return false;
-    resultado = static_cast<TipoBodega>(codigo);
-    return true;
-}
-
-// Compatibilidad directa: General-General, Fragil-Fragil, etc.
-inline bool tipoBodegaEsCompatible(TipoBodega tipo, Categoria categoria) {
-    switch (tipo) {
-    case TipoBodega::GENERAL:    return categoria == Categoria::GENERAL;
-    case TipoBodega::FRAGIL:     return categoria == Categoria::FRAGIL;
-    case TipoBodega::TECNOLOGIA: return categoria == Categoria::TECNOLOGIA;
-    case TipoBodega::DOCUMENTOS: return categoria == Categoria::DOCUMENTOS;
-    }
-    return false;
-}

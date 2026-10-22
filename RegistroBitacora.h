@@ -7,17 +7,17 @@ class Colaborador;
 // Un cambio de estado de un paquete. Una vez creado no se modifica ni se elimina.
 class RegistroBitacora {
 private:
-    EstadoPaquete estadoAnterior;
-    EstadoPaquete nuevoEstado;
+    int estadoAnterior;   // valor de EstadoPaquete
+    int nuevoEstado;      // valor de EstadoPaquete
     Fecha fechaCambio;
     Colaborador* responsable;
 
 public:
-    RegistroBitacora(EstadoPaquete estadoAnterior, EstadoPaquete nuevoEstado,
+    RegistroBitacora(int estadoAnterior, int nuevoEstado,
         const Fecha& fechaCambio, Colaborador* responsable);
 
-    EstadoPaquete getEstadoAnterior() const;
-    EstadoPaquete getNuevoEstado() const;
+    int getEstadoAnterior() const;
+    int getNuevoEstado() const;
     Fecha getFechaCambio() const;
     Colaborador* getResponsable() const;
 

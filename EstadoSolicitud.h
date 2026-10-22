@@ -1,24 +1,23 @@
 #pragma once
 #include <string>
 
-enum class EstadoSolicitud {
-    PENDIENTE,
-    APROBADA,
-    RECHAZADA,
-    ANULADA
+using namespace std;
+
+// Estados de una solicitud de envio. Se guardan como int usando estas
+// constantes (EstadoSolicitud::PENDIENTE, etc.).
+class EstadoSolicitud {
+public:
+    static const int PENDIENTE;
+    static const int APROBADA;
+    static const int RECHAZADA;
+    static const int ANULADA;
+
+    // true si el valor es un estado definido.
+    static bool esValido(int estado);
+
+    // Texto para mostrar. Si el valor no es valido devuelve "Desconocido".
+    static string toString(int estado);
+
+    // Aprobada, Rechazada y Anulada son estados finales.
+    static bool esFinal(int estado);
 };
-
-inline std::string estadoSolicitudToString(EstadoSolicitud e) {
-    switch (e) {
-    case EstadoSolicitud::PENDIENTE: return "Pendiente";
-    case EstadoSolicitud::APROBADA:  return "Aprobada";
-    case EstadoSolicitud::RECHAZADA: return "Rechazada";
-    case EstadoSolicitud::ANULADA:   return "Anulada";
-    }
-    return "Desconocido";
-}
-
-// Aprobada, Rechazada y Anulada son estados finales.
-inline bool estadoSolicitudEsFinal(EstadoSolicitud e) {
-    return e != EstadoSolicitud::PENDIENTE;
-}

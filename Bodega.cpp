@@ -23,7 +23,7 @@ bool Bodega::esDistribucionValida(int filas, int columnas) {
     return filas > 0 && columnas > 0;
 }
 
-Bodega::Bodega(const string& codigo, const string& nombre, TipoBodega tipo,
+Bodega::Bodega(const string& codigo, const string& nombre, int tipo,
     int filas, int columnas) {
     this->codigo = codigo;
     this->nombre = nombre;
@@ -74,7 +74,7 @@ void Bodega::liberarMatriz() {
 
 string Bodega::getCodigo() const { return codigo; }
 string Bodega::getNombre() const { return nombre; }
-TipoBodega Bodega::getTipo() const { return tipo; }
+int Bodega::getTipo() const { return tipo; }
 int Bodega::getFilas() const { return filas; }
 int Bodega::getColumnas() const { return columnas; }
 
@@ -122,8 +122,8 @@ Celda* Bodega::primeraCeldaLibre() const {
     return nullptr;
 }
 
-bool Bodega::esCompatible(Categoria categoria) const {
-    return tipoBodegaEsCompatible(tipo, categoria);
+bool Bodega::esCompatible(int categoria) const {
+    return TipoBodega::esCompatible(tipo, categoria);
 }
 
 int Bodega::totalCeldas() const {
@@ -164,7 +164,7 @@ double Bodega::porcentajeDisponible() const {
 void Bodega::mostrarDatos() const {
     cout << "Codigo: " << codigo << endl;
     cout << "Nombre: " << nombre << endl;
-    cout << "Tipo: " << tipoBodegaToString(tipo) << endl;
+    cout << "Tipo: " << TipoBodega::toString(tipo) << endl;
     cout << "Distribucion: " << filas << " filas x " << columnas
         << " columnas" << endl;
     cout << "Celdas totales: " << totalCeldas() << endl;
@@ -175,7 +175,7 @@ void Bodega::mostrarDatos() const {
 
 void Bodega::mostrarMatriz(bool usarColor) const {
     cout << "Bodega " << codigo << " - " << nombre << " ("
-        << tipoBodegaToString(tipo) << "), " << filas << " filas x "
+        << TipoBodega::toString(tipo) << "), " << filas << " filas x "
         << columnas << " columnas" << endl;
 
     if (matriz == nullptr) {

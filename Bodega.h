@@ -11,7 +11,7 @@ class Bodega {
 private:
     string codigo;
     string nombre;
-    TipoBodega tipo;
+    int tipo;           // valor de TipoBodega (1 a 4)
     int filas;
     int columnas;
     Celda*** matriz;   // matriz dinamica de punteros a Celda
@@ -22,7 +22,7 @@ public:
 
     // Reserva la matriz al crearse. Si filas/columnas no son validas queda
     // sin matriz (0 x 0) como resguardo; el menu debe haberlo rechazado antes.
-    Bodega(const string& codigo, const string& nombre, TipoBodega tipo,
+    Bodega(const string& codigo, const string& nombre, int tipo,
         int filas, int columnas);
     ~Bodega();
 
@@ -35,7 +35,7 @@ public:
 
     string getCodigo() const;
     string getNombre() const;
-    TipoBodega getTipo() const;
+    int getTipo() const;
     int getFilas() const;
     int getColumnas() const;
 
@@ -48,7 +48,7 @@ public:
     bool liberarCelda(int fila, int columna);
 
     Celda* primeraCeldaLibre() const;
-    bool esCompatible(Categoria categoria) const;
+    bool esCompatible(int categoria) const;
 
     int totalCeldas() const;
     int celdasOcupadas() const;

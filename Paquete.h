@@ -18,8 +18,8 @@ private:
     string codigo;
     string descripcion;
     double peso;
-    Categoria categoria;
-    EstadoPaquete estado;
+    int categoria;      // valor de Categoria (1 a 4)
+    int estado;         // valor de EstadoPaquete
     Cliente* propietario;
     CentroDistribucion* centro;
     Bodega* bodega;      // nullptr si no tiene ubicacion
@@ -35,12 +35,12 @@ private:
     // Aplica un cambio de estado permitido por la tabla y lo registra en la
     // bitacora. NO valida las reglas propias de cada operacion (celda,
     // despacho, etc.): eso lo hace CentroDistribucion antes de llamarla.
-    bool aplicarTransicion(EstadoPaquete nuevo, Colaborador* responsable,
+    bool aplicarTransicion(int nuevo, Colaborador* responsable,
         const Fecha& fecha);
     void asignarUbicacion(Bodega* bodega, int fila, int columna);
     void liberarUbicacion();
 
-    void registrarBitacora(EstadoPaquete anterior, EstadoPaquete nuevo,
+    void registrarBitacora(int anterior, int nuevo,
         Colaborador* responsable, const Fecha& fecha);
 
 public:
@@ -50,13 +50,13 @@ public:
 
     // Estado inicial RECIBIDO, sin bodega ni celda.
     Paquete(const string& codigo, const string& descripcion, double peso,
-        Categoria categoria, Cliente* propietario, CentroDistribucion* centro);
+        int categoria, Cliente* propietario, CentroDistribucion* centro);
 
     string getCodigo() const;
     string getDescripcion() const;
     double getPeso() const;
-    Categoria getCategoria() const;
-    EstadoPaquete getEstado() const;
+    int getCategoria() const;
+    int getEstado() const;
     Cliente* getPropietario() const;
     CentroDistribucion* getCentro() const;
     Bodega* getBodega() const;
@@ -66,18 +66,18 @@ public:
     const ListaEnlazada<RegistroBitacora>& getBitacora() const;
 
     // true si la tabla de transiciones del enunciado permite actual -> nuevo.
-    bool esTransicionValida(EstadoPaquete nuevo) const;
+    bool esTransicionValida(int nuevo) const;
 
     // Si el paquete esta en INCIDENCIA, devuelve el estado en que estaba
     // antes (leido de la bitacora). Si no, devuelve el estado actual.
-    EstadoPaquete getEstadoPreIncidencia() const;
+    int getEstadoPreIncidencia() const;
 
     // Cambio de estado "general" del menu. Solo permite:
     //  - pasar a INCIDENCIA desde Recibido, Almacenado o En transito
     //  - resolver una incidencia volviendo a Almacenado SI conserva su celda
     // Todo lo demas (almacenar, aprobar, finalizar, resolver incidencias de
     // despacho) se hace por su operacion en CentroDistribucion.
-    bool cambiarEstado(EstadoPaquete nuevo, Colaborador* responsable,
+    bool cambiarEstado(int nuevo, Colaborador* responsable,
         const Fecha& fecha);
 
     void mostrar() const;
