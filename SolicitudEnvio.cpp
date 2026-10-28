@@ -1,64 +1,49 @@
 #include "SolicitudEnvio.h"
-#include "CentroDistribucion.h"
-#include "Tarifas.h"
+#include "Cliente.h"
+#include "Paquete.h"
 #include <iostream>
 
 using namespace std;
 
-static string estadoSolicitudToString(EstadoSolicitud e) {
-    switch (e) {
-    case PENDIENTE: return "PENDIENTE";
-    case APROBADA:  return "APROBADA";
-    case RECHAZADA: return "RECHAZADA";
-    case ANULADA:   return "ANULADA";
-    }
-    return "?";
+SolicitudEnvio::SolicitudEnvio(const string& codigo, Cliente* cliente,Paquete* paquete, const string& origen, 
+const string& destino,int distancia, const Fecha& fechaSolicitud, double costo): fechaSolicitud(fechaSolicitud){
+
+	this->codigo = codigo;
+	this->cliente = cliente;
+	this->paquete = paquete;
+	this->origen = origen;
+	this->destino = destino;
+	this->distancia = distancia;
+	this->estado = EstadoSolicitud::PENDIENTE;
+	this->costo = costo;
 }
 
-SolicitudEnvio::SolicitudEnvio(string cod, Cliente* cli, Paquete* paq,
-    CentroDistribucion* origen, string dest)
-    : codigo(cod), cliente(cli), paquete(paq), responsable(nullptr),
-    centroOrigen(origen), destino(dest), fechaSolicitud(),
-    costoEstimado(0.0), estado(PENDIENTE) {
-    costoEstimado = calcularCosto();
+string SolicitudEnvio::getCodigo() const { return codigo; }
+Cliente* SolicitudEnvio::getCliente() const { return cliente; }
+Paquete* SolicitudEnvio::getPaquete() const { return paquete; }
+string SolicitudEnvio::getOrigen() const { return origen; }
+string SolicitudEnvio::getDestino() const { return destino; }
+int SolicitudEnvio::getDistancia() const { return distancia; }
+Fecha SolicitudEnvio::getFechaSolicitud() const { return fechaSolicitud; }
+int SolicitudEnvio::getEstado() const { return estado; }
+double SolicitudEnvio::getCosto() const { return costo; }
+
+bool SolicitudEnvio::cambiarEstado(int nuevoEstado) {
+	if (!EstadoSolicitud::esValido(nuevoEstado) || esFinal()) return false;
+	if (nuevoEstado == EstadoSolicitud::PENDIENTE) return false;
+	estado = nuevoEstado;
+	return true;
 }
 
-double SolicitudEnvio::calcularCosto() {
-    if (paquete == nullptr || cliente == nullptr) return 0.0;
-    double costoBase = paquete->getPeso() * Tarifas::obtenerTarifa(paquete->getCategoria());
-    return cliente->calcularCostoFinal(costoBase); // polimorfismo: Persona fisica / Empresa
+bool SolicitudEnvio::esFinal() const {
+	return EstadoSolicitud::esFinal(estado);
 }
 
-bool SolicitudEnvio::aprobar() {
-    if (estado != PENDIENTE) return false;
-    estado = APROBADA;
-    return true;
-}
-
-bool SolicitudEnvio::rechazar() {
-    if (estado != PENDIENTE) return false;
-    estado = RECHAZADA;
-    return true;
-}
-
-bool SolicitudEnvio::anular() {
-    if (estado != PENDIENTE && estado != APROBADA) return false;
-    estado = ANULADA;
-    return true;
-}
-
-bool SolicitudEnvio::esFinal() {
-    return estado == RECHAZADA || estado == ANULADA;
-}
-
-void SolicitudEnvio::mostrar() {
-    cout << "Solicitud: " << codigo << endl;
-    cout << "  Cliente: " << (cliente ? cliente->getNombre() : "N/A") << endl;
-    cout << "  Paquete: " << (paquete ? paquete->getCodigo() : "N/A") << endl;
-    cout << "  Centro origen: " << (centroOrigen ? centroOrigen->getNombre() : "N/A") << endl;
-    cout << "  Destino: " << destino << endl;
-    cout << "  Fecha: " << fechaSolicitud.toString() << endl;
-    cout << "  Costo estimado: " << costoEstimado << endl;
-    cout << "  Estado: " << estadoSolicitudToString(estado) << endl;
-    cout << "  Responsable: " << (responsable ? responsable->getNombreCompleto() : "Sin asignar") << endl;
+void SolicitudEnvio::mostrar() const {
+	cout << "Solicitud: " << codigo << endl;
+	cout << "Origen: " << origen << endl;
+	cout << "Destino: " << destino << endl;
+	cout << "Distancia: " << distancia << endl;
+	cout << "Estado: " << EstadoSolicitud::toString(estado) << endl;
+	cout << "Costo: " << costo << endl;
 }

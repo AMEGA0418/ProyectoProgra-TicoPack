@@ -1,16 +1,9 @@
-#ifndef TARIFAS_H
-#define TARIFAS_H
-#include "Enumeraciones.h"
+#pragma once
+#include "Categoria.h"
 
-// Tarifa por kilogramo segun la categoria del paquete dadas en el proyecto2 .
 class Tarifas {
-private:
-
-    static const double TARIFAS_KG[4]; // GENERAL, FRAGIL, TECNOLOGIA, DOCUMENTOS
-
 public:
-
-    static double obtenerTarifa(Categoria c);
+	static double costoBase(double peso, int distancia);
+	static double costoPorCategoria(double costo, int categoria);
+	static double calcular(double peso, int categoria, int distancia);
 };
-
-#endif

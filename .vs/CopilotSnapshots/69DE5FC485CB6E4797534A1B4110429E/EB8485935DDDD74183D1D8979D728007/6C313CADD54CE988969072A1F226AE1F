@@ -1,0 +1,146 @@
+﻿#include "CentroDistribucion.h"
+#include <iostream>
+
+using namespace std;
+
+CentroDistribucion::CentroDistribucion(const string& codigo,
+	const string& nombre) {
+	this->codigo = codigo;
+	this->nombre = nombre;
+}
+
+string CentroDistribucion::getCodigo() const { return codigo; }
+string CentroDistribucion::getNombre() const { return nombre; }
+
+bool CentroDistribucion::agregarBodega(Bodega* bodega) {
+	if (bodega == nullptr || buscarBodega(bodega->getCodigo()) != nullptr) return false;
+	bodegas.insertarFinal(bodega);
+	return true;
+}
+
+bool CentroDistribucion::agregarCliente(Cliente* cliente) {
+	if (cliente == nullptr || buscarCliente(cliente->getIdentificacion()) != nullptr) return false;
+	clientes.insertarFinal(cliente);
+	return true;
+}
+
+bool CentroDistribucion::agregarColaborador(Colaborador* colaborador) {
+	if (colaborador == nullptr) return false;
+	for (Nodo<Colaborador>* nodo = colaboradores.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getIdentificacion() == colaborador->getIdentificacion()) return false;
+	}
+	colaboradores.insertarFinal(colaborador);
+	return true;
+}
+
+bool CentroDistribucion::agregarPaquete(Paquete* paquete) {
+	if (paquete == nullptr || buscarPaquete(paquete->getCodigo()) != nullptr) return false;
+	paquetes.insertarFinal(paquete);
+	return true;
+}
+
+bool CentroDistribucion::agregarSolicitud(SolicitudEnvio* solicitud) {
+	if (solicitud == nullptr || buscarSolicitud(solicitud->getCodigo()) != nullptr) return false;
+	solicitudes.insertarFinal(solicitud);
+	return true;
+}
+
+bool CentroDistribucion::agregarDespacho(Despacho* despacho) {
+	if (despacho == nullptr || buscarDespacho(despacho->getCodigo()) != nullptr) return false;
+	despachos.insertarFinal(despacho);
+	return true;
+}
+
+Bodega* CentroDistribucion::buscarBodega(const string& codigoBuscado) const {
+	for (Nodo<Bodega>* nodo = bodegas.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getCodigo() == codigoBuscado) return nodo->getDato();
+	}
+	return nullptr;
+}
+
+Cliente* CentroDistribucion::buscarCliente(const string& identificacion) const {
+	for (Nodo<Cliente>* nodo = clientes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getIdentificacion() == identificacion) return nodo->getDato();
+	}
+	return nullptr;
+}
+
+Paquete* CentroDistribucion::buscarPaquete(const string& codigoBuscado) const {
+	for (Nodo<Paquete>* nodo = paquetes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getCodigo() == codigoBuscado) return nodo->getDato();
+	}
+	return nullptr;
+}
+
+SolicitudEnvio* CentroDistribucion::buscarSolicitud(const string& codigoBuscado) const {
+	for (Nodo<SolicitudEnvio>* nodo = solicitudes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getCodigo() == codigoBuscado) return nodo->getDato();
+	}
+	return nullptr;
+}
+
+Despacho* CentroDistribucion::buscarDespacho(const string& codigoBuscado) const {
+	for (Nodo<Despacho>* nodo = despachos.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getCodigo() == codigoBuscado) return nodo->getDato();
+	}
+	return nullptr;
+}
+
+const ListaEnlazada<Bodega>& CentroDistribucion::getBodegas() const { return bodegas; }
+const ListaEnlazada<Cliente>& CentroDistribucion::getClientes() const { return clientes; }
+const ListaEnlazada<Colaborador>& CentroDistribucion::getColaboradores() const { return colaboradores; }
+const ListaEnlazada<Paquete>& CentroDistribucion::getPaquetes() const { return paquetes; }
+const ListaEnlazada<SolicitudEnvio>& CentroDistribucion::getSolicitudes() const { return solicitudes; }
+const ListaEnlazada<Despacho>& CentroDistribucion::getDespachos() const { return despachos; }
+
+bool CentroDistribucion::almacenarPaquete(Paquete* paquete, Bodega* bodega,
+	Colaborador* responsable, const Fecha& fecha) {
+	if (paquete == nullptr || bodega == nullptr || responsable == nullptr ||
+		paquete->getEstado() != EstadoPaquete::RECIBIDO ||
+		!bodega->esCompatible(paquete->getCategoria())) return false;
+
+	Celda* celda = bodega->primeraCeldaLibre();
+	if (celda == nullptr || !paquete->aplicarTransicion(EstadoPaquete::ALMACENADO,
+		responsable, fecha)) return false;
+
+	if (!bodega->asignarPaquete(celda->getFila(), celda->getColumna(), paquete)) {
+		paquete->estado = EstadoPaquete::RECIBIDO;
+		return false;
+	}
+	paquete->asignarUbicacion(bodega, celda->getFila(), celda->getColumna());
+	return true;
+}
+
+bool CentroDistribucion::aprobarSolicitud(SolicitudEnvio* solicitud) {
+	if (solicitud == nullptr) return false;
+	return solicitud->cambiarEstado(EstadoSolicitud::APROBADA);
+}
+
+bool CentroDistribucion::finalizarDespacho(Despacho* despacho,
+	const Fecha& fecha, Colaborador* responsable) {
+	if (despacho == nullptr || responsable == nullptr ||
+		despacho->getEstado() == EstadoDespacho::FINALIZADO) return false;
+
+	for (Nodo<Paquete>* nodo = despacho->getPaquetes().getPrimero();
+		nodo != nullptr; nodo = nodo->getSiguiente()) {
+		if (!nodo->getDato()->aplicarTransicion(EstadoPaquete::EN_TRANSITO,
+			responsable, fecha)) return false;
+	}
+	return despacho->finalizar(fecha);
+}
+
+void CentroDistribucion::mostrar() const {
+	cout << "Centro de distribucion: " << codigo << " - " << nombre << endl;
+	cout << "Bodegas: " << bodegas.getTamano() << endl;
+	cout << "Clientes: " << clientes.getTamano() << endl;
+	cout << "Colaboradores: " << colaboradores.getTamano() << endl;
+	cout << "Paquetes: " << paquetes.getTamano() << endl;
+	cout << "Solicitudes: " << solicitudes.getTamano() << endl;
+	cout << "Despachos: " << despachos.getTamano() << endl;
+}

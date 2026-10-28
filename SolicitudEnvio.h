@@ -1,48 +1,41 @@
-#ifndef SOLICITUDENVIO_H
-#define SOLICITUDENVIO_H
-
+#pragma once
 #include <string>
-#include "Enumeraciones.h"
 #include "Fecha.h"
-#include "Cliente.h"
-#include "Paquete.h"
-#include "Colaborador.h"
+#include "EstadoSolicitud.h"
 
-class CentroDistribucion;
+using namespace std;
+
+class Cliente;
+class Paquete;
 
 class SolicitudEnvio {
 private:
-    std::string codigo;
-    Cliente* cliente;
-    Paquete* paquete;
-    Colaborador* responsable;          // se asigna al aprobar
-    CentroDistribucion* centroOrigen;
-    std::string destino;
-    Fecha fechaSolicitud;
-    double costoEstimado;
-    EstadoSolicitud estado;
+	string codigo;
+	Cliente* cliente;
+	Paquete* paquete;
+	string origen;
+	string destino;
+	int distancia;
+	Fecha fechaSolicitud;
+	int estado;
+	double costo;
 
 public:
-    SolicitudEnvio(std::string cod, Cliente* cli, Paquete* paq,
-        CentroDistribucion* origen, std::string destino);
+	SolicitudEnvio(const string& codigo, Cliente* cliente, Paquete* paquete,
+		const string& origen, const string& destino, int distancia,
+		const Fecha& fechaSolicitud, double costo);
 
-    double calcularCosto();            // peso * tarifa -> descuento del cliente
-    bool aprobar();                    // PENDIENTE -> APROBADA
-    bool rechazar();                   // PENDIENTE -> RECHAZADA
-    bool anular();                     // PENDIENTE/APROBADA -> ANULADA
-    bool esFinal();                    // RECHAZADA o ANULADA
-    void mostrar();
+	string getCodigo() const;
+	Cliente* getCliente() const;
+	Paquete* getPaquete() const;
+	string getOrigen() const;
+	string getDestino() const;
+	int getDistancia() const;
+	Fecha getFechaSolicitud() const;
+	int getEstado() const;
+	double getCosto() const;
 
-    std::string getCodigo() const { return codigo; }
-    Cliente* getCliente() const { return cliente; }
-    Paquete* getPaquete() const { return paquete; }
-    Colaborador* getResponsable() const { return responsable; }
-    CentroDistribucion* getCentroOrigen() const { return centroOrigen; }
-    std::string getDestino() const { return destino; }
-    Fecha getFechaSolicitud() const { return fechaSolicitud; }
-    double getCostoEstimado() const { return costoEstimado; }
-    EstadoSolicitud getEstado() const { return estado; }
-    void setResponsable(Colaborador* r) { responsable = r; }
+	bool cambiarEstado(int nuevoEstado);
+	bool esFinal() const;
+	void mostrar() const;
 };
-
-#endif

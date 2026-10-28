@@ -1,14 +1,19 @@
 #include "Tarifas.h"
 
-// Valores de ejemplo en colones por kg: AJUSTAR a los del enunciado.
-const double Tarifas::TARIFAS_KG[4] = { 1500.0, 2000.0, 2500.0, 1000.0 };
+ double Tarifas::costoBase(double peso, int distancia) {
+	if (peso <= 0 || distancia < 0) return 0;
+	return peso * 100 + distancia * 10;
+}
 
-double Tarifas::obtenerTarifa(Categoria c) {
-    switch (c) {
-    case GENERAL:    return TARIFAS_KG[0];
-    case FRAGIL:     return TARIFAS_KG[1];
-    case TECNOLOGIA: return TARIFAS_KG[2];
-    case DOCUMENTOS: return TARIFAS_KG[3];
-    }
-    return TARIFAS_KG[0];
+double Tarifas::costoPorCategoria(double costo, int categoria) {
+	if (costo < 0 || !Categoria::esValida(categoria)) return 0;
+
+	if (categoria == Categoria::FRAGIL) return costo * 1.25;
+	if (categoria == Categoria::TECNOLOGIA) return costo * 1.15;
+	if (categoria == Categoria::DOCUMENTOS) return costo * 0.90;
+	return costo;
+}
+
+double Tarifas::calcular(double peso, int categoria, int distancia) {
+	return costoPorCategoria(costoBase(peso, distancia), categoria);
 }

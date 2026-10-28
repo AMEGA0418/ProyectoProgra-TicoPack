@@ -1,35 +1,48 @@
 #include "Despacho.h"
-#include "CentroDistribucion.h"
+#include "Colaborador.h"
 #include <iostream>
 
 using namespace std;
 
-Despacho::Despacho(string cod, SolicitudEnvio* sol)
-    : codigo(cod), solicitud(sol), paquete(sol->getPaquete()),
-    cliente(sol->getCliente()), responsable(sol->getResponsable()),
-    centroOrigen(sol->getCentroOrigen()), destino(sol->getDestino()),
-    fechaDespacho(), estado(EN_PROCESO) {}
-
-bool Despacho::puedeFinalizar() {
-    return estado == EN_PROCESO && paquete != nullptr
-        && paquete->getEstado() == EN_TRANSITO;
+Despacho::Despacho(const string& codigo, Colaborador* responsable,
+	const Fecha& fechaCreacion) : fechaCreacion(fechaCreacion),
+	fechaFinalizacion(0, 0, 0) {
+	this->codigo = codigo;
+	this->responsable = responsable;
+	estado = EstadoDespacho::EN_PROCESO;
 }
 
-bool Despacho::finalizar() {
-    if (!puedeFinalizar()) return false;
-    if (!paquete->cambiarEstado(ENTREGADO, responsable)) return false;
-    estado = FINALIZADO;
-    return true;
+string Despacho::getCodigo() const { return codigo; }
+Colaborador* Despacho::getResponsable() const { return responsable; }
+Fecha Despacho::getFechaCreacion() const { return fechaCreacion; }
+Fecha Despacho::getFechaFinalizacion() const { return fechaFinalizacion; }
+int Despacho::getEstado() const { return estado; }
+const ListaEnlazada<Paquete>& Despacho::getPaquetes() const { return paquetes; }
+
+bool Despacho::agregarPaquete(Paquete* paquete) {
+	if (paquete == nullptr || estado == EstadoDespacho::FINALIZADO) return false;
+	if (contienePaquete(paquete)) return false;
+	paquetes.insertarFinal(paquete);
+	return true;
 }
 
-void Despacho::mostrar() {
-    cout << "Despacho: " << codigo << endl;
-    cout << "  Solicitud: " << (solicitud ? solicitud->getCodigo() : "N/A") << endl;
-    cout << "  Paquete: " << (paquete ? paquete->getCodigo() : "N/A") << endl;
-    cout << "  Cliente: " << (cliente ? cliente->getNombre() : "N/A") << endl;
-    cout << "  Responsable: " << (responsable ? responsable->getNombreCompleto() : "N/A") << endl;
-    cout << "  Centro origen: " << (centroOrigen ? centroOrigen->getNombre() : "N/A") << endl;
-    cout << "  Destino: " << destino << endl;
-    cout << "  Fecha: " << fechaDespacho.toString() << endl;
-    cout << "  Estado: " << (estado == EN_PROCESO ? "EN_PROCESO" : "FINALIZADO") << endl;
+bool Despacho::contienePaquete(Paquete* paquete) const {
+	for (Nodo<Paquete>* nodo = paquetes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato() == paquete) return true;
+	}
+	return false;
+}
+
+bool Despacho::finalizar(const Fecha& fecha) {
+	if (estado == EstadoDespacho::FINALIZADO || !fecha.esValida()) return false;
+	estado = EstadoDespacho::FINALIZADO;
+	fechaFinalizacion = fecha;
+	return true;
+}
+
+void Despacho::mostrar() const {
+	cout << "Despacho: " << codigo << endl;
+	cout << "Estado: " << EstadoDespacho::toString(estado) << endl;
+	cout << "Paquetes: " << paquetes.getTamano() << endl;
 }

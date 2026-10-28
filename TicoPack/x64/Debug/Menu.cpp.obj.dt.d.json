@@ -1,0 +1,12 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\menu.cpp",
+        "ProvidedModule": "",
+        "Includes": [
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\menu.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

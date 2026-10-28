@@ -1,42 +1,36 @@
-#ifndef DESPACHO_H
-#define DESPACHO_H
-
+#pragma once
 #include <string>
-#include "Enumeraciones.h"
 #include "Fecha.h"
-#include "Cliente.h"
+#include "EstadoDespacho.h"
+#include "ListaEnlazada.h"
 #include "Paquete.h"
-#include "Colaborador.h"
-#include "SolicitudEnvio.h"
 
-class CentroDistribucion;
+using namespace std;
+
+class Colaborador;
 
 class Despacho {
 private:
-    std::string codigo;
-    SolicitudEnvio* solicitud;
-    Paquete* paquete;
-    Cliente* cliente;
-    Colaborador* responsable;
-    CentroDistribucion* centroOrigen;
-    std::string destino;
-    Fecha fechaDespacho;
-    EstadoDespacho estado;
+	string codigo;
+	Colaborador* responsable;
+	Fecha fechaCreacion;
+	Fecha fechaFinalizacion;
+	int estado;
+	ListaEnlazada<Paquete> paquetes;
 
 public:
-    // Los datos se toman de la solicitud aprobada.
-    Despacho(std::string cod, SolicitudEnvio* sol);
+	Despacho(const string& codigo, Colaborador* responsable,
+		const Fecha& fechaCreacion);
 
-    bool finalizar();        // EN_PROCESO -> FINALIZADO, paquete -> ENTREGADO
-    bool puedeFinalizar();
-    void mostrar();
+	string getCodigo() const;
+	Colaborador* getResponsable() const;
+	Fecha getFechaCreacion() const;
+	Fecha getFechaFinalizacion() const;
+	int getEstado() const;
+	const ListaEnlazada<Paquete>& getPaquetes() const;
 
-    std::string getCodigo() const { return codigo; }
-    SolicitudEnvio* getSolicitud() const { return solicitud; }
-    Paquete* getPaquete() const { return paquete; }
-    Cliente* getCliente() const { return cliente; }
-    Colaborador* getResponsable() const { return responsable; }
-    EstadoDespacho getEstado() const { return estado; }
+	bool agregarPaquete(Paquete* paquete);
+	bool contienePaquete(Paquete* paquete) const;
+	bool finalizar(const Fecha& fecha);
+	void mostrar() const;
 };
-
-#endif
