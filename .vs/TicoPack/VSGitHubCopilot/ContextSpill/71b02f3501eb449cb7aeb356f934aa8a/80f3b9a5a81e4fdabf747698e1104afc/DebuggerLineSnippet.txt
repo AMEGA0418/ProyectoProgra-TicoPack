@@ -1,0 +1,213 @@
+﻿FileId: 5
+``` HTMLPage.htm
+131: 3.8 Solicitudes de envío
+132: Solo se crean para paquetes Almacenado. Cada solicitud tiene código
+133: único global, cliente, paquete, colaborador responsable, centro de
+134: origen, destino descriptivo, fecha, costo estimado y estado.
+135: 
+136: Validaciones: - El cliente indicado debe ser propietario del paquete. -
+137: El centro de origen debe ser el centro del paquete. - El colaborador
+138: debe pertenecer al mismo centro. - Estado inicial: Pendiente. - Desde
+139: Pendiente solo puede pasar a Aprobada, Rechazada o Anulada; son
+140: estados finales. - Un paquete solo puede tener una solicitud pendiente a
+141: la vez. - Tras rechazo o anulación se puede crear otra si el paquete
+142: sigue almacenado. - Tras aprobarse una solicitud y crearse su despacho,
+143: no se permiten nuevas solicitudes para ese paquete. - No se permite
+144: eliminar solicitudes.
+145: 
+146: Tarifas por kilogramo: | Categoría | Tarifa | |---|---:| |
+147: General | ₡1.500 | | Frágil | ₡2.000 | | Tecnología | ₡2.500 |
+148: | Documentos | ₡1.000 |
+149: 
+150: Fórmulas: - Costo base = peso × tarifa por kilogramo - Para empresa:
+151: costo final = costo base − (costo base × descuento / 100) - Para persona
+152: física: no se especifica descuento en el PDF. - El costo final es el que
+153: se guarda como costo estimado. - Las tarifas deben almacenarse como
+154: datos compartidos (por ejemplo, atributos static) o solución
+155: equivalente; no repetir valores en cada cálculo.
+156: 3.9 Despachos
+157: Al aprobar una solicitud pendiente, conservarla como Aprobada y crear
+158: un despacho asociado.
+159: 
+160: Datos mínimos: código único global, solicitud, paquete, cliente,
+161: colaborador responsable, centro de origen, destino, fecha, hora y
+162: estado. Estado inicial: En proceso.
+163: 
+164: Para aprobar: - La solicitud debe seguir Pendiente. - El paquete debe
+165: estar Almacenado. - No debe existir otro despacho para ese paquete. -
+166: El paquete pasa a En tránsito, libera su celda y registra el cambio en
+167: bitácora.
+168: 
+169: Si ocurre una incidencia durante el trayecto, el despacho permanece
+170: En proceso. Al resolverla, el paquete puede volver a En tránsito.
+171: 
+172: Para finalizar: - El despacho debe estar En proceso. - El paquete debe
+173: estar En tránsito. - El despacho pasa a Finalizado y el paquete a
+174: Entregado.
+175: 
+176: Cada solicitud aprobada genera un único despacho y cada paquete puede
+177: tener como máximo uno. No se permite eliminar despachos.
+178: 4. Listas enlazadas obligatorias
+179: Implementar con nodos y memoria dinámica propias: 1. Lista global de
+180: centros. 2. Lista de bodegas por centro. 3. Lista de clientes por
+181: centro. 4. Lista de colaboradores por centro. 5. Lista de paquetes por
+182: centro. 6. Lista de solicitudes por centro. 7. Lista de despachos por
+183: centro. 8. Bitácora de estados de cada paquete.
+184: 5. Operaciones que deben estar en los menús
+185: - Centros: registrar, buscar, mostrar y eliminar. Solo eliminar si
+186:   no tiene clientes, colaboradores, bodegas, paquetes, solicitudes ni
+187:   despachos.
+188: - Clientes: registrar, buscar, mostrar y eliminar. Solo eliminar
+189:   si no tiene paquetes, solicitudes ni despachos asociados.
+190: - Colaboradores: registrar, buscar, mostrar y eliminar. No
+191:   eliminar si es responsable en solicitudes, despachos o bitácoras.
+192: - Bodegas: registrar, buscar, mostrar, consultar matriz y
+193:   eliminar. Solo eliminar si todas las celdas están libres y ningún
+194:   paquete la tiene asignada.
+195: - Paquetes: registrar, buscar, mostrar y eliminar. Solo eliminar
+196:   si está Recibido, sin celda, solicitudes ni despachos.
+197: - Solicitudes: crear, buscar, mostrar y cambiar de Pendiente a
+198:   Aprobada, Rechazada o Anulada según reglas. No eliminar.
+199: - Despachos: buscar, mostrar y finalizar entregas cuando
+200:   corresponda. No eliminar despachos ni bitácoras.
+201: Claves de búsqueda: - Centro: código. - Bodega: código dentro de un
+202: centro. - Cliente y colaborador: identificación dentro de un centro. -
+203: Paquete, solicitud y despacho: código único global.
+204: 6. Reportes obligatorios
+205: 1. Historial de un cliente: seleccionar centro y cliente; listar
+206:    solicitudes y despachos asociados con código, paquete, fecha y
+207:    estado.
+208: 2. Clientes por cantidad de envíos: ordenar de mayor a menor por
+209:    cantidad de despachos Finalizados. En empate, conservar el orden
+210:    original de la lista. Implementar el ordenamiento sin algoritmos
+211:    STL.
+212: 3. Bitácora de un paquete: todos los cambios del más antiguo al más
+213:    reciente, con estado anterior, nuevo estado, fecha y colaborador.
+214: 4. Consulta de despacho de un paquete: mostrar solicitud aprobada y
+215:    despacho asociado, con código, fecha y estado; indicar si no tiene
+216:    despacho.
+217: 5. Ocupación de bodegas: por centro y bodega, total de celdas,
+218:    ocupadas, disponibles y porcentaje de ocupación.
+219: 6. Despachos por colaborador: seleccionar centro y colaborador;
+220:    listar despachos gestionados con código, paquete, fecha y estado.
+221: 7. Menú mínimo sugerido
+222: 1. Centros de distribución
+223: 2. Clientes
+224: 3. Colaboradores
+225: 4. Bodegas y matrices
+226: 5. Paquetes, almacenamiento, reubicación y estados
+227: 6. Solicitudes de envío
+228: 7. Despachos
+229: 8. Reportes
+230: 9. Salir
+231: Las operaciones específicas (almacenar, aprobar solicitud y finalizar
+232: entrega) deben ejecutarse desde sus opciones correspondientes; no
+233: permitir que un cambio genérico de estado evada las reglas.
+234: 8. Criterios de evaluación
+235:   Rubro                                                      Puntos
+236:   Centros, clientes, colaboradores, unicidad y herencia          10
+237:   Bodegas y matriz dinámica                                      10
+238:   Paquetes, estados, incidencias y bitácora                      15
+239:   Almacenamiento y reubicación                                   15
+240:   Solicitudes y cálculo de costos/descuentos                     12
+241:   Despachos                                                      10
+242:   Seis reportes (4 puntos cada uno)                              24
+243:   Interfaz y validaciones generales                               4
+244:   Total                                                 100
+245: 9. Validaciones generales
+246: - No permitir códigos, identificaciones ni textos obligatorios vacíos.
+247: - Evitar duplicados según el alcance de unicidad definido.
+248: - Filas y columnas > 0.
+249: - Peso > 0.
+250: - Descuento entre 0 % y 100 %.
+251: - Categorías, tipos y estados limitados a los valores definidos.
+252: - Verificar existencia y pertenencia al centro de todos los objetos
+253:   referenciados.
+254: - Evitar referencias inválidas al eliminar datos.
+255: - Menús y mensajes claros, interfaz amigable.
+256: - Entrega por Aula Virtual, en el plazo indicado. Solo una persona
+257:   entrega por el grupo e incluye un archivo de texto con nombres
+258:   completos e identificaciones de integrantes.
+259: 10. Checklist de implementación
+260: - [ ] Diagrama de clases y relaciones.
+261: - [ ] Clases base y derivadas para clientes.
+262: - [ ] Nodos y listas enlazadas propias.
+263: - [ ] Matriz dinámica por bodega.
+264: - [ ] Gestión de memoria y destructores adecuados.
+265: - [ ] Validaciones de unicidad y pertenencia al centro.
+266: - [ ] Transiciones de estado centralizadas y bitácora inmutable.
+267: - [ ] Almacenamiento compatible, recomendación y reubicación segura.
+268: - [ ] Solicitudes con tarifas y descuentos.
+269: - [ ] Aprobación que crea despacho y libera celda.
+270: - [ ] Finalización de despacho y entrega.
+271: - [ ] Seis reportes.
+272: - [ ] Menús completos y entradas robustas.
+273: - [ ] Pruebas de errores y casos límite.
+274: - [ ] Compilación limpia y código fuente completo.
+275: Anexo A --- Texto extraído del PDF original
+276: El siguiente texto se incluye como referencia de búsqueda. Puede
+277: contener saltos de línea o formato de tablas distintos al original.
+278: Página 1
+279: Universidad Nacional
+280: 
+281: Facultad de Ciencias Exactas y Naturales
+282: 
+283: EIF - 201 Programación I, II ciclo 20 26
+284: ____________________________________________________________________________
+285: 
+286: 1
+287: 
+288: Proyecto 2 Red de Centros de Distribución
+289: 
+290: Valor porcentual: 15% Fecha de entrega límite: domingo 01 de noviembre
+291: de 2026, antes de las 11:59 p. m.
+292: 
+293: Modalidad de trabajo: en grupos de máximo tres estudiantes Objetivo
+294: general: Aplicar la definición y el uso de las estructuras de datos
+295: llamadas listas y arreglos bidimensionales (matrices), haciendo uso de
+296: clases de colección, punteros, memoria dinámica, herencia y relaciones
+297: entre clases, al diseñar e implementar un programa para la gestión de
+298: una red de centros de distribución dedicada a la recepción,
+299: almacenamiento y despacho de paquetes. Objetivos específicos: − Resolver
+300: el problema en forma eficiente y haciendo uso de los principios del
+301: Paradigma de Programación Orientada a Objetos (POO). − Realizar un
+302: adecuado diseño de clases.
+303: − Implementar adecuadamente la herencia de clases. − Definir e
+304: implementar correctamente las relaciones entre clases.
+305: − Definir y utilizar adecuada y eficientemente arreglos bidimensionales
+306: dinámicos y listas enlazadas. − Administrar eficientemente el uso de
+307: memoria dinámica. − Implementar correctamente el código requerido en el
+308: lenguaje C++. − Crear una interfaz de usuario en consola que permita
+309: interactuar con la aplicación de forma amigable e intuitiva. −
+310: Implementar todas las funcionalidades de la aplicación que se
+311: especifican.
+312: Página 2
+313: Universidad Nacional
+314: 
+315: Facultad de Ciencias Exactas y Naturales
+316: 
+317: EIF - 201 Programación I, II ciclo 20 26
+318: ____________________________________________________________________________
+319: 
+320: 2
+321: 
+322: Descripción general del proyecto TicoPack Logistics es una empresa
+323: costarricense dedicada a la recepción, almacenamiento y despacho de
+324: paquetes. La empresa posee varios centros de distribución y se encuentra
+325: en proceso de expansión, por lo que el sistema debe permitir registrar
+326: nuevos centros sin modificar la estructura principal del programa. Cada
+327: centro de distribución administra clientes, colaboradores, paquetes,
+328: solicitudes de envío, despachos y bodegas. Un centro recién registrado
+329: puede no tener bodegas todavía; estas se incorporan posteriormente
+330: mediante las opciones del sistema. Todas las colecciones que puedan
+331: crecer durante la ejecución deberán manejarse mediante listas enlazadas
+332: dinámicas propias. Cada bodega se organiza físicamente en filas y
+333: columnas. Por esta razón, la distribución de espacios de almacenamiento
+334: debe representarse mediante un arreglo bidimensional dinámico (matriz).
+335: Cada posición de la matriz representa una celda de almacenamiento que
+336: puede estar disponible u ocupada por un paquete. 1. Centros de
+337: distribución De cada centro de distribución se requiere almacenar un
+338: código único, nombre, provincia, dirección descriptiva y teléfono. El
+339: código del centro debe ser único en todo el sistema. Cada centro
+340: mantiene sus propias listas enlazadas de clientes, colaboradores,
+```
