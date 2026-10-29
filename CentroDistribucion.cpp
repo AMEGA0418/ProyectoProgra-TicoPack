@@ -1,5 +1,4 @@
 #include "CentroDistribucion.h"
-#include "Celda.h"
 
 CentroDistribucion::CentroDistribucion(const string& codigo,
 	const string& nombre) {

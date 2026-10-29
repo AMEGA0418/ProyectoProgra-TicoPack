@@ -133,7 +133,9 @@
             "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\estadopaquete.h",
             "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\registrobitacora.h",
             "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\colaborador.h",
-            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\cliente.h"
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\cliente.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\solicitudenvio.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\estadosolicitud.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

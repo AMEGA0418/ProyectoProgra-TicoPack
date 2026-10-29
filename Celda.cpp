@@ -1,7 +1,5 @@
 #include "Celda.h"
 
-using namespace std;
-
 Celda::Celda(const string& codigoBodega, int fila, int columna,
     bool formatoCompacto) {
     this->codigoBodega = codigoBodega;

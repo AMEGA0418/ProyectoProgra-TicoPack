@@ -82,18 +82,21 @@ void Reportes::historialCliente(const CentroDistribucion& centro,
 
 void Reportes::clientesPorEnvios(const CentroDistribucion& centro) {
     int cantidad = centro.getClientes().getTamano();
-    if (cantidad == 0) {
+    if (cantidad <= 0) {
         cout << "No hay clientes registrados." << endl;
         return;
     }
 
-    Cliente** orden = new Cliente * [cantidad];
+    // Reserva segura de memoria y inicialización explícita
+    Cliente** orden = new Cliente * [cantidad]();
     int indice = 0;
+
     for (Nodo<Cliente>* nodo = centro.getClientes().getPrimero();
-        nodo != nullptr; nodo = nodo->getSiguiente()) {
+        nodo != nullptr && indice < cantidad; nodo = nodo->getSiguiente()) {
         orden[indice++] = nodo->getDato();
     }
 
+    // Ordenamiento manual (Bubble Sort sin usar STL)
     for (int i = 0; i < cantidad - 1; i++) {
         for (int j = 0; j < cantidad - i - 1; j++) {
             int actual = 0;
@@ -115,7 +118,9 @@ void Reportes::clientesPorEnvios(const CentroDistribucion& centro) {
         }
     }
 
+    // Mostrar resultados
     for (int i = 0; i < cantidad; i++) {
+        if (orden[i] == nullptr) continue;
         int finalizados = 0;
         for (Nodo<Despacho>* d = centro.getDespachos().getPrimero();
             d != nullptr; d = d->getSiguiente()) {
@@ -128,6 +133,7 @@ void Reportes::clientesPorEnvios(const CentroDistribucion& centro) {
         cout << orden[i]->getNombre() << ": " << finalizados
             << " despachos finalizados" << endl;
     }
+
     delete[] orden;
 }
 
