@@ -1,5 +1,20 @@
 #include "Menu.h"
 
+// Quita espacios en blanco al inicio y al final de un texto.
+static string recortar(const string& texto) {
+    size_t inicio = 0;
+    size_t fin = texto.size();
+    while (inicio < fin && (texto[inicio] == ' ' || texto[inicio] == '\t' ||
+        texto[inicio] == '\n' || texto[inicio] == '\r')) {
+        inicio++;
+    }
+    while (fin > inicio && (texto[fin - 1] == ' ' || texto[fin - 1] == '\t' ||
+        texto[fin - 1] == '\n' || texto[fin - 1] == '\r')) {
+        fin--;
+    }
+    return texto.substr(inicio, fin - inicio);
+}
+
 Menu::Menu(SistemaTicoPack* sistema) {
     this->sistema = sistema;
 }
@@ -11,7 +26,7 @@ void Menu::limpiarPantalla() const {
 
 void Menu::pausar() const {
     cout << "\n[Presione ENTER para continuar...]";
-    cin.ignore(10000, '\n');
+    cin.clear();
     cin.get();
 }
 
@@ -26,6 +41,7 @@ string Menu::leerTexto(const string& mensaje) const {
         cout << mensaje;
         cin >> ws;
         getline(cin, texto);
+        texto = recortar(texto);
         if (!Validador::textoValido(texto)) {
             cout << "[Error] El campo no puede estar vacio. Intente de nuevo.\n";
         }
@@ -53,7 +69,10 @@ double Menu::leerDecimal(const string& mensaje) const {
     while (true) {
         cout << mensaje;
         cin >> valor;
-        if (!cin.fail()) {
+        // Sin <cmath>: se descartan NaN e infinito comparando con el mayor
+        // valor double representable de forma segura.
+        bool esFinito = valor <= 1.0e308 && valor >= -1.0e308;
+        if (!cin.fail() && esFinito) {
             cin.ignore(10000, '\n');
             return valor;
         }
@@ -118,7 +137,7 @@ void Menu::mostrarOpciones() const {
     cout << " 2. Gestion de Clientes\n";
     cout << " 3. Gestion de Colaboradores\n";
     cout << " 4. Bodegas y Matrices de Almacenamiento\n";
-    cout << " 5. Paquetes, Almacenamiento y Reubicacion\n";
+    cout << " 5. Paquetes, Almacenamiento, Reubicacion y Estados\n";
     cout << " 6. Solicitudes de Envio\n";
     cout << " 7. Gestion de Despachos y Entregas\n";
     cout << " 8. Reportes del Sistema\n";
@@ -168,6 +187,10 @@ void Menu::menuCentros() {
             bool eliminado = sistema->eliminarCentro(codigo);
             if (eliminado) confirmarAccion("Centro eliminado exitosamente.");
             else { cout << "[Error] No se puede eliminar el centro (verifique dependencias).\n"; pausar(); }
+        }
+        else if (opcion != 0) {
+            cout << "[Error] Opcion invalida.\n";
+            pausar();
         }
     } while (opcion != 0);
 }
@@ -242,6 +265,10 @@ void Menu::menuClientes() {
             if (eliminado) confirmarAccion("Cliente eliminado correctamente.");
             else { cout << "[Error] No se puede eliminar el cliente (puede tener paquetes o solicitudes asociadas).\n"; pausar(); }
         }
+        else if (opcion != 0) {
+            cout << "[Error] Opcion invalida.\n";
+            pausar();
+        }
     } while (opcion != 0);
 }
 
@@ -294,6 +321,10 @@ void Menu::menuColaboradores() {
             if (eliminado) confirmarAccion("Colaborador eliminado.");
             else { cout << "[Error] No se puede eliminar (el colaborador tiene registros activos o bitácoras asociadas).\n"; pausar(); }
         }
+        else if (opcion != 0) {
+            cout << "[Error] Opcion invalida.\n";
+            pausar();
+        }
     } while (opcion != 0);
 }
 
@@ -306,7 +337,7 @@ void Menu::menuBodegas() {
         cout << "==================================================\n";
         cout << "          MODULO: BODEGAS Y MATRICES              \n";
         cout << "==================================================\n";
-        cout << " 1. Registrar bodega\n 2. Buscar bodega\n 3. Consultar matriz grafica\n 4. Eliminar bodega\n 0. Regresar\n";
+        cout << " 1. Registrar bodega\n 2. Buscar bodega\n 3. Consultar matriz grafica\n 4. Mostrar todas las bodegas\n 5. Eliminar bodega\n 0. Regresar\n";
         cout << "==================================================\n";
         opcion = leerEntero("Seleccione una opcion: ");
 
@@ -349,10 +380,25 @@ void Menu::menuBodegas() {
             pausar();
         }
         else if (opcion == 4) {
+            cout << "\n--- LISTA DE BODEGAS DEL CENTRO ---\n";
+            Nodo<Bodega>* n = centro->getBodegas().getPrimero();
+            if (n == nullptr) cout << "No hay bodegas registradas.\n";
+            while (n != nullptr) {
+                n->getDato()->mostrarDatos();
+                cout << "-----------------------------------\n";
+                n = n->getSiguiente();
+            }
+            pausar();
+        }
+        else if (opcion == 5) {
             string codigo = leerTexto("Codigo de bodega a eliminar: ");
             bool eliminado = centro->eliminarBodega(codigo);
             if (eliminado) confirmarAccion("Bodega eliminada correctamente.");
             else { cout << "[Error] No se puede eliminar (verifique que todas las celdas estén libres y sin paquetes asignados).\n"; pausar(); }
+        }
+        else if (opcion != 0) {
+            cout << "[Error] Opcion invalida.\n";
+            pausar();
         }
     } while (opcion != 0);
 }
@@ -366,14 +412,22 @@ void Menu::menuPaquetes() {
         cout << "==================================================\n";
         cout << "          MODULO: GESTION DE PAQUETES             \n";
         cout << "==================================================\n";
-        cout << " 1. Registrar paquete\n 2. Buscar paquete\n 3. Almacenar paquete\n 4. Reubicar paquete\n 5. Mostrar paquetes\n 6. Eliminar paquete\n 0. Regresar\n";
+        cout << " 1. Registrar paquete\n";
+        cout << " 2. Buscar paquete\n";
+        cout << " 3. Almacenar paquete\n";
+        cout << " 4. Reubicar paquete\n";
+        cout << " 5. Mostrar paquetes\n";
+        cout << " 6. Eliminar paquete\n";
+        cout << " 7. Reportar incidencia\n";
+        cout << " 8. Resolver incidencia\n";
+        cout << " 0. Regresar\n";
         cout << "==================================================\n";
         opcion = leerEntero("Seleccione una opcion: ");
 
         if (opcion == 1) {
             string codigo = leerTexto("Codigo unico global del paquete: ");
-            if (centro->buscarPaquete(codigo) != nullptr) {
-                cout << "[Error] El codigo de paquete ya existe en este centro.\n";
+            if (sistema->buscarPaqueteGlobal(codigo) != nullptr) {
+                cout << "[Error] Ya existe un paquete con ese codigo en el sistema.\n";
                 pausar();
                 continue;
             }
@@ -388,7 +442,8 @@ void Menu::menuPaquetes() {
             double peso = leerDecimal("Peso en kg (>0): ");
             int categoria = leerEntero("Categoria (1: General, 2: Fragil, 3: Tecnologia, 4: Documentos): ");
 
-            if (!Categoria::esValida(categoria) || peso <= 0 || descripcion.empty()) {
+            if (!Categoria::esValida(categoria) || peso <= 0 ||
+                !Paquete::datosValidos(codigo, descripcion, peso)) {
                 cout << "[Error] Datos del paquete invalidos (verifique peso y categoria).\n";
                 pausar();
                 continue;
@@ -397,6 +452,7 @@ void Menu::menuPaquetes() {
             if (!centro->agregarPaquete(p)) {
                 delete p;
                 cout << "[Error] No se pudo registrar el paquete.\n";
+                pausar();
             }
             else {
                 confirmarAccion("Paquete registrado con estado RECIBIDO.");
@@ -410,25 +466,132 @@ void Menu::menuPaquetes() {
         }
         else if (opcion == 3) {
             Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete a almacenar: "));
-            Bodega* b = centro->buscarBodega(leerTexto("Codigo de bodega compatible: "));
-            Colaborador* c = seleccionarColaborador(centro);
-            if (p != nullptr && b != nullptr && c != nullptr) {
-                bool almacenado = centro->almacenarPaquete(p, b, c, leerFecha("Fecha de almacenamiento"));
-                if (almacenado) confirmarAccion("Paquete almacenado correctamente en celda asignada.");
-                else { cout << "[Error] No se pudo almacenar (verifique compatibilidad de categoría o espacio disponible).\n"; pausar(); }
+            if (p == nullptr) {
+                cout << "[Aviso] Paquete no encontrado.\n";
+                pausar();
+                continue;
             }
-            else { pausar(); }
+
+            bool puedeAlmacenarse = (p->getEstado() == EstadoPaquete::RECIBIDO);
+            if (p->getEstado() == EstadoPaquete::INCIDENCIA &&
+                !p->tieneUbicacion() &&
+                p->getEstadoPreIncidencia() == EstadoPaquete::RECIBIDO) {
+                puedeAlmacenarse = true;
+            }
+            if (!puedeAlmacenarse) {
+                cout << "[Error] Solo se pueden almacenar paquetes en estado Recibido "
+                    << "o con una incidencia originada antes de almacenarse.\n";
+                pausar();
+                continue;
+            }
+
+            cout << "\n--- BODEGAS COMPATIBLES CON LA CATEGORIA "
+                << Categoria::toString(p->getCategoria()) << " ---\n";
+            bool hayCompatibles = false;
+            for (Nodo<Bodega>* nodo = centro->getBodegas().getPrimero();
+                nodo != nullptr; nodo = nodo->getSiguiente()) {
+                Bodega* bodega = nodo->getDato();
+                if (bodega->esCompatible(p->getCategoria()) &&
+                    bodega->celdasLibres() > 0) {
+                    hayCompatibles = true;
+                    bodega->mostrarCeldasDisponibles();
+                }
+            }
+            if (!hayCompatibles) {
+                cout << "[Error] No existe una bodega compatible con espacio disponible.\n";
+                pausar();
+                continue;
+            }
+
+            Bodega* recomendada = centro->recomendarBodega(p->getCategoria());
+            Celda* celdaRecomendada = recomendada->primeraCeldaLibre();
+            cout << "\n[Recomendacion] Bodega " << recomendada->getCodigo()
+                << " (" << recomendada->getNombre() << "), celda "
+                << celdaRecomendada->getIdentificador()
+                << ", con " << recomendada->celdasLibres() << " celdas disponibles.\n";
+
+            Bodega* bodegaDestino = nullptr;
+            int fila = -1;
+            int columna = -1;
+            int decision = leerEntero("1. Aceptar recomendacion  2. Elegir otra celda: ");
+
+            if (decision == 1) {
+                bodegaDestino = recomendada;
+                fila = celdaRecomendada->getFila();
+                columna = celdaRecomendada->getColumna();
+            }
+            else if (decision == 2) {
+                string codigoBodega = leerTexto("Codigo de la bodega compatible: ");
+                bodegaDestino = centro->buscarBodega(codigoBodega);
+                if (bodegaDestino == nullptr ||
+                    !bodegaDestino->esCompatible(p->getCategoria()) ||
+                    bodegaDestino->celdasLibres() <= 0) {
+                    cout << "[Error] Bodega inexistente o no compatible con espacio disponible.\n";
+                    pausar();
+                    continue;
+                }
+                bodegaDestino->mostrarCeldasDisponibles();
+                fila = leerEntero("Fila de la celda destino: ");
+                columna = leerEntero("Columna de la celda destino: ");
+            }
+            else {
+                cout << "[Error] Opcion no valida.\n";
+                pausar();
+                continue;
+            }
+
+            Colaborador* c = seleccionarColaborador(centro);
+            if (c == nullptr) { pausar(); continue; }
+
+            bool almacenado = centro->almacenarPaquete(p, bodegaDestino, fila,
+                columna, c, leerFecha("Fecha de almacenamiento"));
+            if (almacenado) {
+                confirmarAccion("Paquete almacenado correctamente en la celda indicada.");
+            }
+            else {
+                cout << "[Error] No se pudo almacenar (celda ocupada, bodega incompatible o datos invalidos).\n";
+                pausar();
+            }
         }
         else if (opcion == 4) {
             Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete a reubicar: "));
+            if (p == nullptr) {
+                cout << "[Aviso] Paquete no encontrado.\n";
+                pausar();
+                continue;
+            }
+            if (p->getEstado() != EstadoPaquete::ALMACENADO ||
+                !p->tieneUbicacion()) {
+                cout << "[Error] Solo se pueden reubicar paquetes Almacenados con celda asignada.\n";
+                pausar();
+                continue;
+            }
+
+            cout << "Ubicacion actual: bodega " << p->getCodigoBodega()
+                << ", fila " << p->getFila() << ", columna " << p->getColumna()
+                << endl;
+            cout << "\n--- BODEGAS COMPATIBLES CON CELDAS DISPONIBLES ---\n";
+            for (Nodo<Bodega>* nodo = centro->getBodegas().getPrimero();
+                nodo != nullptr; nodo = nodo->getSiguiente()) {
+                Bodega* bodega = nodo->getDato();
+                if (bodega->esCompatible(p->getCategoria()) &&
+                    bodega->celdasLibres() > 0) {
+                    bodega->mostrarCeldasDisponibles();
+                }
+            }
+
             Bodega* b = centro->buscarBodega(leerTexto("Codigo de bodega destino: "));
+            if (b == nullptr) {
+                cout << "[Error] Bodega no encontrada.\n";
+                pausar();
+                continue;
+            }
             int fila = leerEntero("Fila destino: ");
             int col = leerEntero("Columna destino: ");
-            if (p != nullptr && b != nullptr) {
-                bool reubicado = centro->reubicarPaquete(p, b, fila, col);
-                if (reubicado) confirmarAccion("Paquete reubicado exitosamente.");
-                else { cout << "[Error] No se pudo reubicar (celda ocupada, incompatible o inexistente).\n"; pausar(); }
-            }
+
+            bool reubicado = centro->reubicarPaquete(p, b, fila, col);
+            if (reubicado) confirmarAccion("Paquete reubicado exitosamente.");
+            else { cout << "[Error] No se pudo reubicar (celda ocupada, incompatible o inexistente).\n"; pausar(); }
         }
         else if (opcion == 5) {
             cout << "\n--- LISTA DE PAQUETES DEL CENTRO ---\n";
@@ -443,6 +606,68 @@ void Menu::menuPaquetes() {
             if (eliminado) confirmarAccion("Paquete eliminado.");
             else { cout << "[Error] No se puede eliminar (solo paquetes en Recibido sin celda, solicitudes o despachos).\n"; pausar(); }
         }
+        else if (opcion == 7) {
+            Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete con incidencia: "));
+            if (p == nullptr) {
+                cout << "[Aviso] Paquete no encontrado.\n";
+                pausar();
+                continue;
+            }
+            int estado = p->getEstado();
+            if (estado != EstadoPaquete::RECIBIDO &&
+                estado != EstadoPaquete::ALMACENADO &&
+                estado != EstadoPaquete::EN_TRANSITO) {
+                cout << "[Error] No se puede reportar incidencia en el estado actual ("
+                    << EstadoPaquete::toString(estado) << ").\n";
+                pausar();
+                continue;
+            }
+            Colaborador* c = seleccionarColaborador(centro);
+            if (c == nullptr) { pausar(); continue; }
+            bool reportada = centro->reportarIncidencia(p, c,
+                leerFecha("Fecha de la incidencia"));
+            if (reportada) {
+                confirmarAccion("Incidencia registrada. La ubicacion actual se conserva si corresponde.");
+            }
+            else {
+                cout << "[Error] No se pudo registrar la incidencia.\n";
+                pausar();
+            }
+        }
+        else if (opcion == 8) {
+            Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete en incidencia: "));
+            if (p == nullptr) {
+                cout << "[Aviso] Paquete no encontrado.\n";
+                pausar();
+                continue;
+            }
+            if (p->getEstado() != EstadoPaquete::INCIDENCIA) {
+                cout << "[Error] El paquete no se encuentra en estado Incidencia.\n";
+                pausar();
+                continue;
+            }
+
+            int estadoPrevio = p->getEstadoPreIncidencia();
+            if (estadoPrevio == EstadoPaquete::RECIBIDO) {
+                cout << "[Aviso] La incidencia ocurrio antes de almacenar. "
+                    << "Use la opcion 3 (Almacenar paquete) para asignarle una celda.\n";
+                pausar();
+                continue;
+            }
+
+            cout << "Al resolver la incidencia el paquete volvera a "
+                << EstadoPaquete::toString(estadoPrevio) << ".\n";
+            Colaborador* c = seleccionarColaborador(centro);
+            if (c == nullptr) { pausar(); continue; }
+            bool resuelta = centro->resolverIncidencia(p, c,
+                leerFecha("Fecha de resolucion de la incidencia"));
+            if (resuelta) confirmarAccion("Incidencia resuelta correctamente.");
+            else { cout << "[Error] No se pudo resolver la incidencia (verifique el despacho y la celda).\n"; pausar(); }
+        }
+        else if (opcion != 0) {
+            cout << "[Error] Opcion invalida.\n";
+            pausar();
+        }
     } while (opcion != 0);
 }
 
@@ -455,37 +680,56 @@ void Menu::menuSolicitudes() {
         cout << "==================================================\n";
         cout << "          MODULO: SOLICITUDES DE ENVIO            \n";
         cout << "==================================================\n";
-        cout << " 1. Crear solicitud de envio\n 2. Buscar solicitud\n 3. Aprobar solicitud (Crea despacho)\n 4. Rechazar solicitud\n 5. Anular solicitud\n 0. Regresar\n";
+        cout << " 1. Crear solicitud de envio\n";
+        cout << " 2. Buscar solicitud\n";
+        cout << " 3. Aprobar solicitud (Crea despacho)\n";
+        cout << " 4. Rechazar solicitud\n";
+        cout << " 5. Anular solicitud\n";
+        cout << " 6. Mostrar todas las solicitudes\n";
+        cout << " 0. Regresar\n";
         cout << "==================================================\n";
         opcion = leerEntero("Seleccione una opcion: ");
 
         if (opcion == 1) {
             Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete (debe estar Almacenado): "));
-            Colaborador* c = seleccionarColaborador(centro);
-            if (p == nullptr || c == nullptr) { pausar(); continue; }
+            if (p == nullptr) {
+                cout << "[Aviso] Paquete no encontrado.\n";
+                pausar();
+                continue;
+            }
             if (p->getEstado() != EstadoPaquete::ALMACENADO) {
                 cout << "[Error] El paquete no se encuentra en estado Almacenado.\n";
                 pausar();
                 continue;
             }
+            Colaborador* c = seleccionarColaborador(centro);
+            if (c == nullptr) { pausar(); continue; }
+
             Cliente* cliente = p->getPropietario();
             string codigo = leerTexto("Codigo unico de la solicitud: ");
-            if (centro->buscarSolicitud(codigo) != nullptr) {
-                cout << "[Error] Ya existe una solicitud con ese codigo en este centro.\n";
+            if (sistema->buscarSolicitudGlobal(codigo) != nullptr) {
+                cout << "[Error] Ya existe una solicitud con ese codigo en el sistema.\n";
                 pausar();
                 continue;
             }
-            double tarifaBase = Tarifas::calcular(p->getPeso(), p->getCategoria(), 0);
-            double costoFinal = cliente->calcularCostoFinal(tarifaBase);
-            string destino = leerTexto("Descripcion del destino de entrega: ");
 
-            SolicitudEnvio* s = new SolicitudEnvio(codigo, cliente, p, c, centro->getCodigo(), destino, 0, leerFecha("Fecha de solicitud"), costoFinal);
+            double costoBase = Tarifas::calcular(p->getPeso(), p->getCategoria());
+            double costoFinal = cliente->calcularCostoFinal(costoBase);
+            string destino = leerTexto("Descripcion del destino de entrega: ");
+            Fecha fechaSolicitud = leerFecha("Fecha de solicitud");
+
+            SolicitudEnvio* s = new SolicitudEnvio(codigo, cliente, p, c,
+                centro->getCodigo(), destino, 0, fechaSolicitud, costoFinal);
             if (!centro->agregarSolicitud(s)) {
                 delete s;
-                cout << "[Error] No se pudo crear la solicitud (el paquete ya posee una solicitud pendiente).\n";
+                cout << "[Error] No se pudo crear la solicitud (el paquete ya posee "
+                    << "una solicitud pendiente o un despacho asociado).\n";
+                pausar();
             }
             else {
-                confirmarAccion("Solicitud creada con estado PENDIENTE. Costo estimado calculado.");
+                cout << "Costo base: " << costoBase << " | Costo final: "
+                    << costoFinal << endl;
+                confirmarAccion("Solicitud creada con estado PENDIENTE.");
             }
         }
         else if (opcion == 2) {
@@ -496,20 +740,56 @@ void Menu::menuSolicitudes() {
         }
         else if (opcion == 3) {
             SolicitudEnvio* s = centro->buscarSolicitud(leerTexto("Codigo de solicitud a aprobar: "));
-            if (s != nullptr) {
-                bool aprobado = centro->aprobarSolicitud(s, s->getResponsable(), leerFecha("Fecha de aprobacion"));
-                if (aprobado) confirmarAccion("Solicitud aprobada con exito. Despacho creado y paquete en transito.");
-                else { cout << "[Error] No se pudo aprobar la solicitud.\n"; pausar(); }
+            if (s == nullptr) {
+                cout << "[Aviso] Solicitud no encontrada.\n";
+                pausar();
+                continue;
+            }
+            if (s->getEstado() != EstadoSolicitud::PENDIENTE) {
+                cout << "[Error] Solo se pueden aprobar solicitudes Pendientes.\n";
+                pausar();
+                continue;
+            }
+            Colaborador* c = seleccionarColaborador(centro);
+            if (c == nullptr) { pausar(); continue; }
+            bool aprobado = centro->aprobarSolicitud(s, c,
+                leerFecha("Fecha de aprobacion"));
+            if (aprobado) {
+                confirmarAccion("Solicitud aprobada con exito. Despacho creado y paquete en transito.");
+            }
+            else {
+                cout << "[Error] No se pudo aprobar la solicitud (verifique que el paquete "
+                    << "siga Almacenado y no tenga otro despacho).\n";
+                pausar();
             }
         }
         else if (opcion == 4 || opcion == 5) {
             SolicitudEnvio* s = centro->buscarSolicitud(leerTexto("Codigo de solicitud: "));
-            if (s != nullptr) {
-                int nuevoEstadoInt = (opcion == 4) ? 2 : 3;
-                bool cambiado = s->cambiarEstado(nuevoEstadoInt);
-                if (cambiado) confirmarAccion("Estado de solicitud actualizado correctamente.");
-                else { cout << "[Error] No se pudo cambiar el estado (la solicitud ya no esta pendiente).\n"; pausar(); }
+            if (s == nullptr) {
+                cout << "[Aviso] Solicitud no encontrada.\n";
+                pausar();
+                continue;
             }
+            int nuevoEstado = (opcion == 4) ? EstadoSolicitud::RECHAZADA :
+                EstadoSolicitud::ANULADA;
+            bool cambiado = s->cambiarEstado(nuevoEstado);
+            if (cambiado) confirmarAccion("Estado de solicitud actualizado correctamente.");
+            else { cout << "[Error] No se pudo cambiar el estado (la solicitud ya no esta pendiente).\n"; pausar(); }
+        }
+        else if (opcion == 6) {
+            cout << "\n--- LISTA DE SOLICITUDES DEL CENTRO ---\n";
+            Nodo<SolicitudEnvio>* n = centro->getSolicitudes().getPrimero();
+            if (n == nullptr) cout << "No hay solicitudes registradas.\n";
+            while (n != nullptr) {
+                n->getDato()->mostrar();
+                cout << "-----------------------------------\n";
+                n = n->getSiguiente();
+            }
+            pausar();
+        }
+        else if (opcion != 0) {
+            cout << "[Error] Opcion invalida.\n";
+            pausar();
         }
     } while (opcion != 0);
 }
@@ -542,12 +822,21 @@ void Menu::menuDespachos() {
         }
         else if (opcion == 3) {
             Despacho* d = centro->buscarDespacho(leerTexto("Codigo de despacho a finalizar: "));
-            Colaborador* c = seleccionarColaborador(centro);
-            if (d != nullptr && c != nullptr) {
-                bool finalizado = centro->finalizarDespacho(d, leerFecha("Fecha de finalizacion"), c);
-                if (finalizado) confirmarAccion("Entrega finalizada con exito. Paquete ENTREGADO.");
-                else { cout << "[Error] No se pudo finalizar (verifique que el despacho este En proceso y el paquete En transito).\n"; pausar(); }
+            if (d == nullptr) {
+                cout << "[Aviso] Despacho no encontrado.\n";
+                pausar();
+                continue;
             }
+            Colaborador* c = seleccionarColaborador(centro);
+            if (c == nullptr) { pausar(); continue; }
+            bool finalizado = centro->finalizarDespacho(d,
+                leerFecha("Fecha de finalizacion"), c);
+            if (finalizado) confirmarAccion("Entrega finalizada con exito. Paquete ENTREGADO.");
+            else { cout << "[Error] No se pudo finalizar (verifique que el despacho este En proceso y el paquete En transito).\n"; pausar(); }
+        }
+        else if (opcion != 0) {
+            cout << "[Error] Opcion invalida.\n";
+            pausar();
         }
     } while (opcion != 0);
 }

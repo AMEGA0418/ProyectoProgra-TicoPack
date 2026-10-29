@@ -22,6 +22,11 @@ private:
 	int estado;
 	double costo;
 
+	// La aprobacion solo puede ejecutarse desde la operacion del centro,
+	// que valida todas las reglas del negocio.
+	friend class CentroDistribucion;
+	bool aprobar();
+
 public:
 	SolicitudEnvio(const string& codigo, Cliente* cliente, Paquete* paquete,
 		const string& origen, const string& destino, int distancia,

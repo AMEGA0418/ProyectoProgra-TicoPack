@@ -235,3 +235,28 @@ void Bodega::mostrarMatriz(bool usarColor) const {
     }
     cout << borde << endl;
 }
+
+void Bodega::mostrarCeldasDisponibles() const {
+    cout << "Celdas disponibles de la bodega " << codigo << " ("
+        << TipoBodega::toString(tipo) << "):" << endl;
+
+    if (matriz == nullptr) {
+        cout << "  (la bodega no tiene matriz reservada)" << endl;
+        return;
+    }
+
+    int disponibles = 0;
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            if (matriz[i][j]->estaLibre()) {
+                cout << "  " << matriz[i][j]->getIdentificador()
+                    << " (fila " << i << ", columna " << j << ")" << endl;
+                disponibles++;
+            }
+        }
+    }
+
+    if (disponibles == 0) {
+        cout << "  (no hay celdas disponibles)" << endl;
+    }
+}

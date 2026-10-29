@@ -61,4 +61,6 @@ public:
     // Dibuja la matriz en consola. Con usarColor=true usa colores ANSI
     // (verde libre / rojo ocupada); solo si la consola los soporta.
     void mostrarMatriz(bool usarColor = false) const;
+    // Lista los identificadores de las celdas libres de la bodega.
+    void mostrarCeldasDisponibles() const;
 };

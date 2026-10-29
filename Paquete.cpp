@@ -26,13 +26,19 @@ Paquete::Paquete(const string& codigo, const string& descripcion, double peso,
     this->peso = peso;
     this->categoria = categoria;
     this->propietario = propietario;
+    codigoCentro = "";
     estado = EstadoPaquete::RECIBIDO;
     codigoBodega = "";
     fila = -1;
     columna = -1;
 }
 
+void Paquete::asignarCentro(const string& nuevoCodigoCentro) {
+    codigoCentro = nuevoCodigoCentro;
+}
+
 string Paquete::getCodigo() const { return codigo; }
+string Paquete::getCodigoCentro() const { return codigoCentro; }
 string Paquete::getDescripcion() const { return descripcion; }
 double Paquete::getPeso() const { return peso; }
 int Paquete::getCategoria() const { return categoria; }
@@ -59,13 +65,18 @@ int Paquete::getEstadoPreIncidencia() const {
         return estado;
     }
 
-    // El ultimo registro es el que llevo el paquete a INCIDENCIA.
-    int anterior = estado;
+    // El ultimo registro es el que llevo el paquete a INCIDENCIA; su estado
+    // anterior indica el estado que se debe recuperar al resolverla.
+    RegistroBitacora* ultimo = nullptr;
     for (Nodo<RegistroBitacora>* n = bitacora.getPrimero(); n != nullptr;
         n = n->getSiguiente()) {
-        anterior = n->getDato()->getEstadoAnterior();
+        ultimo = n->getDato();
     }
-    return anterior;
+    if (ultimo != nullptr &&
+        ultimo->getNuevoEstado() == EstadoPaquete::INCIDENCIA) {
+        return ultimo->getEstadoAnterior();
+    }
+    return estado;
 }
 
 void Paquete::registrarBitacora(int anterior, int nuevo,
@@ -105,9 +116,17 @@ bool Paquete::cambiarEstado(int nuevo, Colaborador* responsable,
             estado == EstadoPaquete::ALMACENADO ||
             estado == EstadoPaquete::EN_TRANSITO);
     }
-    else if (estado == EstadoPaquete::INCIDENCIA &&
-        nuevo == EstadoPaquete::ALMACENADO) {
-        permitido = tieneUbicacion();
+    else if (estado == EstadoPaquete::INCIDENCIA) {
+        if (nuevo == EstadoPaquete::ALMACENADO) {
+            // Solo si la incidencia ocurrio estando almacenado y la celda
+            // asignada se conserva.
+            permitido = tieneUbicacion();
+        }
+        else if (nuevo == EstadoPaquete::EN_TRANSITO) {
+            // Incidencia ocurrida durante un despacho En proceso: el paquete
+            // no tiene celda y puede volver a En transito.
+            permitido = !tieneUbicacion();
+        }
     }
 
     if (!permitido) return false;
@@ -120,6 +139,8 @@ void Paquete::mostrar() const {
     cout << "Peso: " << peso << " kg" << endl;
     cout << "Categoria: " << Categoria::toString(categoria) << endl;
     cout << "Estado: " << EstadoPaquete::toString(estado) << endl;
+    cout << "Centro: " << (codigoCentro.empty() ? "(sin asignar)" : codigoCentro)
+        << endl;
 
     if (propietario != nullptr) {
         cout << "Propietario: " << propietario->getNombre()

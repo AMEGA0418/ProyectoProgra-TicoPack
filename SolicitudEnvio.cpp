@@ -43,7 +43,15 @@ double SolicitudEnvio::getCosto() const { return costo; }
 bool SolicitudEnvio::cambiarEstado(int nuevoEstado) {
 	if (!EstadoSolicitud::esValido(nuevoEstado) || esFinal()) return false;
 	if (nuevoEstado == EstadoSolicitud::PENDIENTE) return false;
+	// La aprobacion requiere las validaciones de CentroDistribucion.
+	if (nuevoEstado == EstadoSolicitud::APROBADA) return false;
 	estado = nuevoEstado;
+	return true;
+}
+
+bool SolicitudEnvio::aprobar() {
+	if (estado != EstadoSolicitud::PENDIENTE) return false;
+	estado = EstadoSolicitud::APROBADA;
 	return true;
 }
 
@@ -53,12 +61,20 @@ bool SolicitudEnvio::esFinal() const {
 
 void SolicitudEnvio::mostrar() const {
 	cout << "Solicitud: " << codigo << endl;
+	if (cliente != nullptr) {
+		cout << "Cliente: " << cliente->getNombre()
+			<< " (" << cliente->getIdentificacion() << ")" << endl;
+	}
+	if (paquete != nullptr) {
+		cout << "Paquete: " << paquete->getCodigo() << endl;
+	}
 	cout << "Origen: " << origen << endl;
 	cout << "Destino: " << destino << endl;
-	cout << "Distancia: " << distancia << endl;
+	cout << "Fecha de solicitud: " << fechaSolicitud.toString()
+		<< " " << fechaSolicitud.horaToString() << endl;
 	cout << "Estado: " << EstadoSolicitud::toString(estado) << endl;
 	if (responsable != nullptr) {
 		cout << "Responsable: " << responsable->getNombreCompleto() << endl;
 	}
-	cout << "Costo: " << costo << endl;
+	cout << "Costo estimado: " << costo << endl;
 }

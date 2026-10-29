@@ -1,0 +1,1999 @@
+diff --git a/Bodega.cpp b/Bodega.cpp
+index 1dfbfac..3673d2d 100644
+--- a/Bodega.cpp
++++ b/Bodega.cpp
+@@ -234,4 +234,29 @@ void Bodega::mostrarMatriz(bool usarColor) const {
+         }
+     }
+     cout << borde << endl;
++}
++
++void Bodega::mostrarCeldasDisponibles() const {
++    cout << "Celdas disponibles de la bodega " << codigo << " ("
++        << TipoBodega::toString(tipo) << "):" << endl;
++
++    if (matriz == nullptr) {
++        cout << "  (la bodega no tiene matriz reservada)" << endl;
++        return;
++    }
++
++    int disponibles = 0;
++    for (int i = 0; i < filas; i++) {
++        for (int j = 0; j < columnas; j++) {
++            if (matriz[i][j]->estaLibre()) {
++                cout << "  " << matriz[i][j]->getIdentificador()
++                    << " (fila " << i << ", columna " << j << ")" << endl;
++                disponibles++;
++            }
++        }
++    }
++
++    if (disponibles == 0) {
++        cout << "  (no hay celdas disponibles)" << endl;
++    }
+ }
+\ No newline at end of file
+diff --git a/Bodega.h b/Bodega.h
+index b547beb..ba605af 100644
+--- a/Bodega.h
++++ b/Bodega.h
+@@ -61,4 +61,6 @@ public:
+     // Dibuja la matriz en consola. Con usarColor=true usa colores ANSI
+     // (verde libre / rojo ocupada); solo si la consola los soporta.
+     void mostrarMatriz(bool usarColor = false) const;
++    // Lista los identificadores de las celdas libres de la bodega.
++    void mostrarCeldasDisponibles() const;
+ };
+\ No newline at end of file
+diff --git a/CentroDistribucion.cpp b/CentroDistribucion.cpp
+index bb83da0..72ecb2a 100644
+--- a/CentroDistribucion.cpp
++++ b/CentroDistribucion.cpp
+@@ -1,4 +1,5 @@
+ #include "CentroDistribucion.h"
++#include "Validador.h"
+ 
+ CentroDistribucion::CentroDistribucion(const string& codigo,
+ 	const string& nombre) {
+@@ -9,9 +10,150 @@ CentroDistribucion::CentroDistribucion(const string& codigo,
+ 	this->telefono = "";
+ }
+ 
++CentroDistribucion::CentroDistribucion(const string& codigo,
++	const string& nombre, const string& provincia,
++	const string& direccion, const string& telefono) {
++	this->codigo = codigo;
++	this->nombre = nombre;
++	this->provincia = provincia;
++	this->direccion = direccion;
++	this->telefono = telefono;
++}
++
++string CentroDistribucion::getCodigo() const { return codigo; }
++string CentroDistribucion::getNombre() const { return nombre; }
++string CentroDistribucion::getProvincia() const { return provincia; }
++string CentroDistribucion::getDireccion() const { return direccion; }
++string CentroDistribucion::getTelefono() const { return telefono; }
++
++bool CentroDistribucion::agregarBodega(Bodega* bodega) {
++	if (bodega == nullptr || !Validador::textoValido(bodega->getCodigo()) ||
++		!Validador::textoValido(bodega->getNombre()) ||
++		!TipoBodega::esValido(bodega->getTipo()) ||
++		!Bodega::esDistribucionValida(bodega->getFilas(), bodega->getColumnas()) ||
++		buscarBodega(bodega->getCodigo()) != nullptr) {
++		return false;
++	}
++	bodegas.insertarFinal(bodega);
++	return true;
++}
++
++bool CentroDistribucion::agregarCliente(Cliente* cliente) {
++	if (cliente == nullptr ||
++		!Validador::textoValido(cliente->getIdentificacion()) ||
++		!Validador::textoValido(cliente->getNombre()) ||
++		buscarCliente(cliente->getIdentificacion()) != nullptr) {
++		return false;
++	}
++	clientes.insertarFinal(cliente);
++	return true;
++}
++
++bool CentroDistribucion::agregarColaborador(Colaborador* colaborador) {
++	if (colaborador == nullptr ||
++		!Validador::textoValido(colaborador->getIdentificacion()) ||
++		!Validador::textoValido(colaborador->getNombreCompleto()) ||
++		buscarColaborador(colaborador->getIdentificacion()) != nullptr) {
++		return false;
++	}
++	colaboradores.insertarFinal(colaborador);
++	return true;
++}
++
++bool CentroDistribucion::agregarPaquete(Paquete* paquete) {
++	if (paquete == nullptr || paquete->getPropietario() == nullptr ||
++		!Paquete::datosValidos(paquete->getCodigo(),
++			paquete->getDescripcion(), paquete->getPeso()) ||
++		!Categoria::esValida(paquete->getCategoria()) ||
++		buscarCliente(paquete->getPropietario()->getIdentificacion()) !=
++		paquete->getPropietario() ||
++		buscarPaquete(paquete->getCodigo()) != nullptr) {
++		return false;
++	}
++
++	if (paquete->getCodigoCentro().empty()) {
++		paquete->asignarCentro(codigo);
++	}
++	else if (paquete->getCodigoCentro() != codigo) {
++		return false;
++	}
++
++	paquetes.insertarFinal(paquete);
++	return true;
++}
++
++bool CentroDistribucion::agregarSolicitud(SolicitudEnvio* solicitud) {
++	if (solicitud == nullptr ||
++		!Validador::textoValido(solicitud->getCodigo()) ||
++		!Validador::textoValido(solicitud->getDestino()) ||
++		!solicitud->getFechaSolicitud().esValida() ||
++		solicitud->getCosto() < 0 ||
++		buscarSolicitud(solicitud->getCodigo()) != nullptr ||
++		solicitud->getOrigen() != codigo ||
++		solicitud->getCliente() == nullptr || solicitud->getPaquete() == nullptr ||
++		solicitud->getResponsable() == nullptr ||
++		buscarCliente(solicitud->getCliente()->getIdentificacion()) !=
++		solicitud->getCliente() ||
++		buscarPaquete(solicitud->getPaquete()->getCodigo()) !=
++		solicitud->getPaquete() ||
++		buscarColaborador(solicitud->getResponsable()->getIdentificacion()) !=
++		solicitud->getResponsable() ||
++		solicitud->getCliente() != solicitud->getPaquete()->getPropietario() ||
++		solicitud->getPaquete()->getEstado() != EstadoPaquete::ALMACENADO) {
++		return false;
++	}
++
++	// Un paquete con despacho ya no admite nuevas solicitudes.
++	if (despachoDePaqueteInterno(solicitud->getPaquete()) != nullptr) return false;
++
++	for (Nodo<SolicitudEnvio>* nodo = solicitudes.getPrimero(); nodo != nullptr;
++		nodo = nodo->getSiguiente()) {
++		if (nodo->getDato()->getPaquete() == solicitud->getPaquete() &&
++			nodo->getDato()->getEstado() == EstadoSolicitud::PENDIENTE) return false;
++	}
++	solicitudes.insertarFinal(solicitud);
++	return true;
++}
++
++bool CentroDistribucion::agregarDespacho(Despacho* despacho) {
++	if (despacho == nullptr || !Validador::textoValido(despacho->getCodigo()) ||
++		despacho->getEstado() != EstadoDespacho::EN_PROCESO ||
++		buscarDespacho(despacho->getCodigo()) != nullptr ||
++		despacho->getSolicitud() == nullptr ||
++		buscarSolicitud(despacho->getSolicitud()->getCodigo()) !=
++		despacho->getSolicitud() ||
++		despacho->getSolicitud()->getEstado() != EstadoSolicitud::APROBADA ||
++		despacho->getPaquetes().getTamano() != 1) {
++		return false;
++	}
++
++	for (Nodo<Paquete>* paquete = despacho->getPaquetes().getPrimero();
++		paquete != nullptr; paquete = paquete->getSiguiente()) {
++		Paquete* actual = paquete->getDato();
++		if (actual == nullptr ||
++			actual != despacho->getSolicitud()->getPaquete() ||
++			buscarPaquete(actual->getCodigo()) != actual ||
++			actual->getEstado() != EstadoPaquete::EN_TRANSITO) {
++			return false;
++		}
++		for (Nodo<Despacho>* existente = despachos.getPrimero();
++			existente != nullptr; existente = existente->getSiguiente()) {
++			if (existente->getDato()->contienePaquete(actual)) return false;
++		}
++	}
++	despachos.insertarFinal(despacho);
++	return true;
++}
++
+ bool CentroDistribucion::eliminarBodega(const string& codigoBuscado) {
+ 	Bodega* bodega = buscarBodega(codigoBuscado);
+ 	if (bodega == nullptr || bodega->celdasOcupadas() != 0) return false;
++
++	// Verificacion adicional: ningun paquete debe referenciar la bodega.
++	for (Nodo<Paquete>* nodo = paquetes.getPrimero(); nodo != nullptr;
++		nodo = nodo->getSiguiente()) {
++		if (nodo->getDato()->getCodigoBodega() == codigoBuscado) return false;
++	}
+ 	return bodegas.eliminar(bodega);
+ }
+ 
+@@ -27,18 +169,15 @@ bool CentroDistribucion::eliminarCliente(const string& identificacion) {
+ 		nodo = nodo->getSiguiente()) {
+ 		if (nodo->getDato()->getCliente() == cliente) return false;
+ 	}
++	for (Nodo<Despacho>* nodo = despachos.getPrimero(); nodo != nullptr;
++		nodo = nodo->getSiguiente()) {
++		if (nodo->getDato()->getCliente() == cliente) return false;
++	}
+ 	return clientes.eliminar(cliente);
+ }
+ 
+ bool CentroDistribucion::eliminarColaborador(const string& identificacion) {
+-	Colaborador* colaborador = nullptr;
+-	for (Nodo<Colaborador>* nodo = colaboradores.getPrimero(); nodo != nullptr;
+-		nodo = nodo->getSiguiente()) {
+-		if (nodo->getDato()->getIdentificacion() == identificacion) {
+-			colaborador = nodo->getDato();
+-			break;
+-		}
+-	}
++	Colaborador* colaborador = buscarColaborador(identificacion);
+ 	if (colaborador == nullptr) return false;
+ 
+ 	for (Nodo<SolicitudEnvio>* nodo = solicitudes.getPrimero(); nodo != nullptr;
+@@ -82,116 +221,79 @@ bool CentroDistribucion::tieneDependencias() const {
+ 		!solicitudes.estaVacia() || !despachos.estaVacia();
+ }
+ 
+-CentroDistribucion::CentroDistribucion(const string& codigo,
+-	const string& nombre, const string& provincia,
+-	const string& direccion, const string& telefono) {
+-	this->codigo = codigo;
+-	this->nombre = nombre;
+-	this->provincia = provincia;
+-	this->direccion = direccion;
+-	this->telefono = telefono;
++Bodega* CentroDistribucion::recomendarBodega(int categoria) const {
++	Bodega* mejor = nullptr;
++	for (Nodo<Bodega>* nodo = bodegas.getPrimero(); nodo != nullptr;
++		nodo = nodo->getSiguiente()) {
++		Bodega* bodega = nodo->getDato();
++		if (!bodega->esCompatible(categoria) || bodega->celdasLibres() <= 0) {
++			continue;
++		}
++		if (mejor == nullptr ||
++			bodega->porcentajeDisponible() > mejor->porcentajeDisponible()) {
++			mejor = bodega;
++		}
++	}
++	return mejor;
+ }
+ 
+-string CentroDistribucion::getCodigo() const { return codigo; }
+-string CentroDistribucion::getNombre() const { return nombre; }
+-string CentroDistribucion::getProvincia() const { return provincia; }
+-string CentroDistribucion::getDireccion() const { return direccion; }
+-string CentroDistribucion::getTelefono() const { return telefono; }
++Despacho* CentroDistribucion::despachoDePaqueteInterno(const Paquete* paquete) const {
++	if (paquete == nullptr) return nullptr;
++	for (Nodo<Despacho>* nodo = despachos.getPrimero(); nodo != nullptr;
++		nodo = nodo->getSiguiente()) {
++		if (nodo->getDato()->contienePaquete(paquete)) {
++			return nodo->getDato();
++		}
++	}
++	return nullptr;
++}
+ 
+-bool CentroDistribucion::agregarBodega(Bodega* bodega) {
+-	if (bodega == nullptr || buscarBodega(bodega->getCodigo()) != nullptr) return false;
+-	bodegas.insertarFinal(bodega);
+-	return true;
++Despacho* CentroDistribucion::buscarDespachoDePaquete(const Paquete* paquete) const {
++	return despachoDePaqueteInterno(paquete);
++}
++
++void CentroDistribucion::liberarUbicacionPaquete(Paquete* paquete) {
++	if (paquete == nullptr || !paquete->tieneUbicacion()) return;
++
++	Bodega* bodega = buscarBodega(paquete->getCodigoBodega());
++	if (bodega != nullptr) {
++		bodega->liberarCelda(paquete->getFila(), paquete->getColumna());
++	}
++	paquete->liberarUbicacion();
+ }
+ 
+ bool CentroDistribucion::reubicarPaquete(Paquete* paquete, Bodega* destino,
+ 	int nuevaFila, int nuevaColumna) {
+ 	if (paquete == nullptr || destino == nullptr ||
++		buscarPaquete(paquete->getCodigo()) != paquete ||
++		paquete->getCodigoCentro() != codigo ||
+ 		paquete->getEstado() != EstadoPaquete::ALMACENADO ||
+ 		!paquete->tieneUbicacion() ||
+-		!destino->esCompatible(paquete->getCategoria()) ||
+-		destino->consultarCelda(nuevaFila, nuevaColumna) == nullptr ||
+-		!destino->consultarCelda(nuevaFila, nuevaColumna)->estaLibre()) {
+-		return false;
+-	}
+-
+-	Bodega* origen = buscarBodega(paquete->getCodigoBodega());
+-	if (origen == nullptr ||
+-		origen->consultarCelda(paquete->getFila(), paquete->getColumna()) == nullptr ||
+-		origen->consultarCelda(paquete->getFila(), paquete->getColumna())->getPaquete() != paquete) {
++		buscarBodega(destino->getCodigo()) != destino ||
++		!destino->esCompatible(paquete->getCategoria())) {
+ 		return false;
+ 	}
+ 
+ 	Celda* nuevaCelda = destino->consultarCelda(nuevaFila, nuevaColumna);
+-	if (!destino->asignarPaquete(nuevaFila, nuevaColumna, paquete)) return false;
+-
+-	origen->liberarCelda(paquete->getFila(), paquete->getColumna());
+-	paquete->asignarUbicacion(destino->getCodigo(), nuevaFila, nuevaColumna);
+-	return nuevaCelda->getPaquete() == paquete;
+-}
++	if (nuevaCelda == nullptr || !nuevaCelda->estaLibre()) return false;
+ 
+-bool CentroDistribucion::agregarCliente(Cliente* cliente) {
+-	if (cliente == nullptr || cliente->getIdentificacion().empty() ||
+-		buscarCliente(cliente->getIdentificacion()) != nullptr) return false;
+-	clientes.insertarFinal(cliente);
+-	return true;
+-}
++	Bodega* origen = buscarBodega(paquete->getCodigoBodega());
++	if (origen == nullptr) return false;
+ 
+-bool CentroDistribucion::agregarColaborador(Colaborador* colaborador) {
+-	if (colaborador == nullptr || colaborador->getIdentificacion().empty()) return false;
+-	for (Nodo<Colaborador>* nodo = colaboradores.getPrimero(); nodo != nullptr;
+-		nodo = nodo->getSiguiente()) {
+-		if (nodo->getDato()->getIdentificacion() == colaborador->getIdentificacion()) return false;
++	Celda* celdaActual = origen->consultarCelda(paquete->getFila(),
++		paquete->getColumna());
++	if (celdaActual == nullptr || celdaActual->getPaquete() != paquete) {
++		return false;
+ 	}
+-	colaboradores.insertarFinal(colaborador);
+-	return true;
+-}
+-
+-bool CentroDistribucion::agregarPaquete(Paquete* paquete) {
+-	if (paquete == nullptr || paquete->getCodigo().empty() ||
+-		paquete->getPropietario() == nullptr ||
+-		buscarCliente(paquete->getPropietario()->getIdentificacion()) != paquete->getPropietario() ||
+-		buscarPaquete(paquete->getCodigo()) != nullptr) return false;
+-	paquetes.insertarFinal(paquete);
+-	return true;
+-}
+-
+-bool CentroDistribucion::agregarSolicitud(SolicitudEnvio* solicitud) {
+-	if (solicitud == nullptr || solicitud->getCodigo().empty() ||
+-		buscarSolicitud(solicitud->getCodigo()) != nullptr ||
+-		solicitud->getCliente() == nullptr || solicitud->getPaquete() == nullptr ||
+-		solicitud->getResponsable() == nullptr ||
+-		buscarCliente(solicitud->getCliente()->getIdentificacion()) != solicitud->getCliente() ||
+-		buscarPaquete(solicitud->getPaquete()->getCodigo()) != solicitud->getPaquete() ||
+-		buscarColaborador(solicitud->getResponsable()->getIdentificacion()) != solicitud->getResponsable() ||
+-		solicitud->getCliente() != solicitud->getPaquete()->getPropietario() ||
+-		solicitud->getPaquete()->getEstado() != EstadoPaquete::ALMACENADO) return false;
+ 
+-	for (Nodo<SolicitudEnvio>* nodo = solicitudes.getPrimero(); nodo != nullptr;
+-		nodo = nodo->getSiguiente()) {
+-		if (nodo->getDato()->getPaquete() == solicitud->getPaquete() &&
+-			nodo->getDato()->getEstado() == EstadoSolicitud::PENDIENTE) return false;
++	// No se libera la celda original hasta confirmar el destino.
++	if (!destino->asignarPaquete(nuevaFila, nuevaColumna, paquete)) return false;
++	if (!origen->liberarCelda(paquete->getFila(), paquete->getColumna())) {
++		destino->liberarCelda(nuevaFila, nuevaColumna);
++		return false;
+ 	}
+-	solicitudes.insertarFinal(solicitud);
+-	return true;
+-}
+-
+-bool CentroDistribucion::agregarDespacho(Despacho* despacho) {
+-	if (despacho == nullptr || despacho->getCodigo().empty() ||
+-		buscarDespacho(despacho->getCodigo()) != nullptr ||
+-		despacho->getSolicitud() == nullptr ||
+-		buscarSolicitud(despacho->getSolicitud()->getCodigo()) != despacho->getSolicitud()) return false;
+ 
+-	for (Nodo<Paquete>* paquete = despacho->getPaquetes().getPrimero();
+-		paquete != nullptr; paquete = paquete->getSiguiente()) {
+-		if (paquete->getDato() == nullptr ||
+-			buscarPaquete(paquete->getDato()->getCodigo()) != paquete->getDato()) return false;
+-		for (Nodo<Despacho>* existente = despachos.getPrimero(); existente != nullptr;
+-			existente = existente->getSiguiente()) {
+-			if (existente->getDato()->contienePaquete(paquete->getDato())) return false;
+-		}
+-	}
+-	despachos.insertarFinal(despacho);
++	paquete->asignarUbicacion(destino->getCodigo(), nuevaFila, nuevaColumna);
+ 	return true;
+ }
+ 
+@@ -252,82 +354,228 @@ const ListaEnlazada<Despacho>& CentroDistribucion::getDespachos() const { return
+ 
+ bool CentroDistribucion::almacenarPaquete(Paquete* paquete, Bodega* bodega,
+ 	Colaborador* responsable, const Fecha& fecha) {
++	if (bodega == nullptr) return false;
++	Celda* celda = bodega->primeraCeldaLibre();
++	if (celda == nullptr) return false;
++	return almacenarPaquete(paquete, bodega, celda->getFila(),
++		celda->getColumna(), responsable, fecha);
++}
++
++bool CentroDistribucion::almacenarPaquete(Paquete* paquete, Bodega* bodega,
++	int fila, int columna, Colaborador* responsable, const Fecha& fecha) {
+ 	if (paquete == nullptr || bodega == nullptr || responsable == nullptr ||
+-		paquete->getEstado() != EstadoPaquete::RECIBIDO ||
+-		!bodega->esCompatible(paquete->getCategoria())) return false;
++		!fecha.esValida() ||
++		buscarPaquete(paquete->getCodigo()) != paquete ||
++		paquete->getCodigoCentro() != codigo ||
++		buscarBodega(bodega->getCodigo()) != bodega ||
++		buscarColaborador(responsable->getIdentificacion()) != responsable ||
++		!bodega->esCompatible(paquete->getCategoria())) {
++		return false;
++	}
+ 
+-	Celda* celda = bodega->primeraCeldaLibre();
+-	if (celda == nullptr || !bodega->asignarPaquete(celda->getFila(),
+-		celda->getColumna(), paquete)) return false;
++	bool puedeAlmacenarse = (paquete->getEstado() == EstadoPaquete::RECIBIDO);
++	if (paquete->getEstado() == EstadoPaquete::INCIDENCIA &&
++		!paquete->tieneUbicacion() &&
++		paquete->getEstadoPreIncidencia() == EstadoPaquete::RECIBIDO) {
++		puedeAlmacenarse = true;
++	}
++	if (!puedeAlmacenarse) return false;
++
++	Celda* celda = bodega->consultarCelda(fila, columna);
++	if (celda == nullptr || !celda->estaLibre()) return false;
+ 
+-	if (!paquete->aplicarTransicion(EstadoPaquete::ALMACENADO,
+-		responsable, fecha)) {
+-		bodega->liberarCelda(celda->getFila(), celda->getColumna());
++	if (!bodega->asignarPaquete(fila, columna, paquete)) return false;
++	if (!paquete->aplicarTransicion(EstadoPaquete::ALMACENADO, responsable,
++		fecha)) {
++		bodega->liberarCelda(fila, columna);
+ 		return false;
+ 	}
+-	paquete->asignarUbicacion(bodega->getCodigo(), celda->getFila(),
+-		celda->getColumna());
++
++	paquete->asignarUbicacion(bodega->getCodigo(), fila, columna);
+ 	return true;
+ }
+ 
+-bool CentroDistribucion::aprobarSolicitud(SolicitudEnvio* solicitud) {
+-	// La aprobacion completa requiere responsable y fecha.
++bool CentroDistribucion::reportarIncidencia(Paquete* paquete,
++	Colaborador* responsable, const Fecha& fecha) {
++	if (paquete == nullptr || responsable == nullptr || !fecha.esValida() ||
++		buscarPaquete(paquete->getCodigo()) != paquete ||
++		paquete->getCodigoCentro() != codigo ||
++		buscarColaborador(responsable->getIdentificacion()) != responsable) {
++		return false;
++	}
++
++	int estado = paquete->getEstado();
++	if (estado == EstadoPaquete::INCIDENCIA ||
++		estado == EstadoPaquete::ENTREGADO) {
++		return false;
++	}
++
++	// Si el paquete ya esta en transito debe existir un despacho En proceso.
++	if (estado == EstadoPaquete::EN_TRANSITO) {
++		Despacho* despacho = buscarDespachoDePaquete(paquete);
++		if (despacho == nullptr ||
++			despacho->getEstado() != EstadoDespacho::EN_PROCESO) {
++			return false;
++		}
++	}
++	else if (estado == EstadoPaquete::ALMACENADO) {
++		// La celda debe seguir conteniendo al paquete durante la incidencia.
++		if (!paquete->tieneUbicacion()) return false;
++		Bodega* bodega = buscarBodega(paquete->getCodigoBodega());
++		if (bodega == nullptr) return false;
++		Celda* celda = bodega->consultarCelda(paquete->getFila(),
++			paquete->getColumna());
++		if (celda == nullptr || celda->getPaquete() != paquete) return false;
++	}
++
++	return paquete->cambiarEstado(EstadoPaquete::INCIDENCIA, responsable, fecha);
++}
++
++bool CentroDistribucion::resolverIncidencia(Paquete* paquete,
++	Colaborador* responsable, const Fecha& fecha) {
++	if (paquete == nullptr || responsable == nullptr || !fecha.esValida() ||
++		buscarPaquete(paquete->getCodigo()) != paquete ||
++		paquete->getCodigoCentro() != codigo ||
++		buscarColaborador(responsable->getIdentificacion()) != responsable ||
++		paquete->getEstado() != EstadoPaquete::INCIDENCIA) {
++		return false;
++	}
++
++	int estadoPrevio = paquete->getEstadoPreIncidencia();
++
++	if (estadoPrevio == EstadoPaquete::ALMACENADO) {
++		if (!paquete->tieneUbicacion()) return false;
++		Bodega* bodega = buscarBodega(paquete->getCodigoBodega());
++		if (bodega == nullptr) return false;
++		Celda* celda = bodega->consultarCelda(paquete->getFila(),
++			paquete->getColumna());
++		if (celda == nullptr || celda->getPaquete() != paquete) return false;
++		return paquete->cambiarEstado(EstadoPaquete::ALMACENADO, responsable,
++			fecha);
++	}
++
++	if (estadoPrevio == EstadoPaquete::EN_TRANSITO) {
++		Despacho* despacho = buscarDespachoDePaquete(paquete);
++		if (despacho == nullptr ||
++			despacho->getEstado() != EstadoDespacho::EN_PROCESO) {
++			return false;
++		}
++		return paquete->cambiarEstado(EstadoPaquete::EN_TRANSITO, responsable,
++			fecha);
++	}
++
++	// Si la incidencia ocurrio en Recibido, debe almacenarse con la operacion
++	// normal para pasar a Almacenado.
+ 	return false;
+ }
+ 
+ bool CentroDistribucion::aprobarSolicitud(SolicitudEnvio* solicitud,
+ 	Colaborador* responsable, const Fecha& fecha) {
+ 	if (solicitud == nullptr || responsable == nullptr || !fecha.esValida() ||
++		buscarSolicitud(solicitud->getCodigo()) != solicitud ||
++		buscarColaborador(responsable->getIdentificacion()) != responsable ||
+ 		solicitud->getEstado() != EstadoSolicitud::PENDIENTE ||
+-		solicitud->getPaquete() == nullptr ||
+-		solicitud->getCliente() != solicitud->getPaquete()->getPropietario() ||
+-		solicitud->getPaquete()->getEstado() != EstadoPaquete::ALMACENADO ||
+-		buscarPaquete(solicitud->getPaquete()->getCodigo()) != solicitud->getPaquete()) {
++		solicitud->getOrigen() != codigo ||
++		solicitud->getCliente() == nullptr || solicitud->getPaquete() == nullptr ||
++		solicitud->getResponsable() == nullptr ||
++		solicitud->getCliente() != solicitud->getPaquete()->getPropietario()) {
+ 		return false;
+ 	}
+-	if (solicitud->getResponsable() != nullptr &&
+-		solicitud->getResponsable() != responsable) return false;
+-	if (buscarDespacho(solicitud->getCodigo() + "-D") != nullptr) return false;
+ 
+ 	Paquete* paquete = solicitud->getPaquete();
+-	Despacho* despacho = new Despacho(solicitud->getCodigo() + "-D",
+-		solicitud, responsable, fecha);
++	if (buscarPaquete(paquete->getCodigo()) != paquete ||
++		paquete->getCodigoCentro() != codigo ||
++		paquete->getEstado() != EstadoPaquete::ALMACENADO ||
++		!paquete->tieneUbicacion() ||
++		despachoDePaqueteInterno(paquete) != nullptr) {
++		return false;
++	}
++
++	// La celda actual debe existir y contener al paquete.
++	Bodega* bodegaActual = buscarBodega(paquete->getCodigoBodega());
++	if (bodegaActual == nullptr) return false;
++	Celda* celdaActual = bodegaActual->consultarCelda(paquete->getFila(),
++		paquete->getColumna());
++	if (celdaActual == nullptr || celdaActual->getPaquete() != paquete) {
++		return false;
++	}
++
++	string codigoDespacho = solicitud->getCodigo() + "-D";
++	int consecutivo = 1;
++	while (buscarDespacho(codigoDespacho) != nullptr) {
++		codigoDespacho = solicitud->getCodigo() + "-D" +
++			to_string(consecutivo++);
++	}
++
++	Despacho* despacho = new Despacho(codigoDespacho, solicitud, responsable,
++		fecha);
+ 	if (!despacho->agregarPaquete(paquete)) {
+ 		delete despacho;
+ 		return false;
+ 	}
+ 
+-	if (!paquete->aplicarTransicion(EstadoPaquete::EN_TRANSITO,
+-		responsable, fecha) ||
+-		!solicitud->cambiarEstado(EstadoSolicitud::APROBADA) ||
+-		!agregarDespacho(despacho)) {
++	if (!paquete->aplicarTransicion(EstadoPaquete::EN_TRANSITO, responsable,
++		fecha)) {
++		delete despacho;
++		return false;
++	}
++	if (!solicitud->aprobar()) {
++		delete despacho;
++		return false;
++	}
++	if (!agregarDespacho(despacho)) {
+ 		delete despacho;
+ 		return false;
+ 	}
+ 
+-	paquete->liberarUbicacion();
++	// El paquete en transito libera inmediatamente su celda.
++	liberarUbicacionPaquete(paquete);
+ 	return true;
+ }
+ 
+ bool CentroDistribucion::finalizarDespacho(Despacho* despacho,
+ 	const Fecha& fecha, Colaborador* responsable) {
+-	if (despacho == nullptr || responsable == nullptr ||
+-		despacho->getEstado() == EstadoDespacho::FINALIZADO) return false;
++	if (despacho == nullptr || responsable == nullptr || !fecha.esValida() ||
++		buscarDespacho(despacho->getCodigo()) != despacho ||
++		buscarColaborador(responsable->getIdentificacion()) != responsable ||
++		despacho->getEstado() != EstadoDespacho::EN_PROCESO ||
++		despacho->getSolicitud() == nullptr ||
++		despacho->getSolicitud()->getEstado() != EstadoSolicitud::APROBADA ||
++		despacho->getSolicitud()->getPaquete() != despacho->getPaquete() ||
++		despacho->getPaquetes().estaVacia()) {
++		return false;
++	}
+ 
++	// Validar todo antes de aplicar cambios para no dejar datos a medias.
+ 	for (Nodo<Paquete>* nodo = despacho->getPaquetes().getPrimero();
+ 		nodo != nullptr; nodo = nodo->getSiguiente()) {
+ 		Paquete* paquete = nodo->getDato();
+-		if (paquete == nullptr || paquete->getEstado() != EstadoPaquete::EN_TRANSITO ||
+-			!paquete->aplicarTransicion(EstadoPaquete::ENTREGADO,
+-			responsable, fecha)) return false;
++		if (paquete == nullptr ||
++			paquete->getCodigoCentro() != codigo ||
++			buscarPaquete(paquete->getCodigo()) != paquete ||
++			paquete->getEstado() != EstadoPaquete::EN_TRANSITO) {
++			return false;
++		}
++	}
+ 
+-		paquete->liberarUbicacion();
++	for (Nodo<Paquete>* nodo = despacho->getPaquetes().getPrimero();
++		nodo != nullptr; nodo = nodo->getSiguiente()) {
++		Paquete* paquete = nodo->getDato();
++		if (!paquete->aplicarTransicion(EstadoPaquete::ENTREGADO,
++			responsable, fecha)) {
++			return false;
++		}
++		liberarUbicacionPaquete(paquete);
+ 	}
++
+ 	return despacho->finalizar(fecha);
+ }
+ 
+ void CentroDistribucion::mostrar() const {
+ 	cout << "Centro de distribucion: " << codigo << " - " << nombre << endl;
++	cout << "Provincia: " << provincia << endl;
++	cout << "Direccion: " << direccion << endl;
++	cout << "Telefono: " << telefono << endl;
+ 	cout << "Bodegas: " << bodegas.getTamano() << endl;
+ 	cout << "Clientes: " << clientes.getTamano() << endl;
+ 	cout << "Colaboradores: " << colaboradores.getTamano() << endl;
+diff --git a/CentroDistribucion.h b/CentroDistribucion.h
+index a4051f8..d53e6ad 100644
+--- a/CentroDistribucion.h
++++ b/CentroDistribucion.h
+@@ -27,6 +27,11 @@ private:
+ 	ListaEnlazada<SolicitudEnvio> solicitudes;
+ 	ListaEnlazada<Despacho> despachos;
+ 
++	// Busca el despacho (si existe) asociado a un paquete.
++	Despacho* despachoDePaqueteInterno(const Paquete* paquete) const;
++	// Libera la celda de la matriz (si existe) y limpia la ubicacion.
++	void liberarUbicacionPaquete(Paquete* paquete);
++
+ public:
+ 	CentroDistribucion(const string& codigo, const string& nombre);
+ 	CentroDistribucion(const string& codigo, const string& nombre,
+@@ -56,6 +61,7 @@ public:
+ 	Paquete* buscarPaquete(const string& codigo) const;
+ 	SolicitudEnvio* buscarSolicitud(const string& codigo) const;
+ 	Despacho* buscarDespacho(const string& codigo) const;
++	Despacho* buscarDespachoDePaquete(const Paquete* paquete) const;
+ 
+ 	const ListaEnlazada<Bodega>& getBodegas() const;
+ 	const ListaEnlazada<Cliente>& getClientes() const;
+@@ -64,15 +70,34 @@ public:
+ 	const ListaEnlazada<SolicitudEnvio>& getSolicitudes() const;
+ 	const ListaEnlazada<Despacho>& getDespachos() const;
+ 
++	// Bodega compatible con la categoria que tiene el mayor porcentaje de
++	// espacio disponible y al menos una celda libre. nullptr si no existe.
++	Bodega* recomendarBodega(int categoria) const;
++
++	// Almacenamiento: usa la primera celda libre de la bodega indicada.
+ 	bool almacenarPaquete(Paquete* paquete, Bodega* bodega,
+ 		Colaborador* responsable, const Fecha& fecha);
++	// Almacenamiento en una celda especifica.
++	bool almacenarPaquete(Paquete* paquete, Bodega* bodega, int fila,
++		int columna, Colaborador* responsable, const Fecha& fecha);
++
+ 	bool reubicarPaquete(Paquete* paquete, Bodega* destino,
+ 		int fila, int columna);
+-	bool aprobarSolicitud(SolicitudEnvio* solicitud);
++
+ 	bool aprobarSolicitud(SolicitudEnvio* solicitud,
+ 		Colaborador* responsable, const Fecha& fecha);
+ 	bool finalizarDespacho(Despacho* despacho, const Fecha& fecha,
+ 		Colaborador* responsable);
++
++	// Incidencias: se reportan desde Recibido, Almacenado o En transito.
++	bool reportarIncidencia(Paquete* paquete, Colaborador* responsable,
++		const Fecha& fecha);
++	// Resuelve una incidencia devolviendo el paquete a Almacenado (si conserva
++	// celda) o a En transito (si el despacho sigue En proceso). Si la
++	// incidencia ocurrio en Recibido, debe usarse el almacenamiento normal.
++	bool resolverIncidencia(Paquete* paquete, Colaborador* responsable,
++		const Fecha& fecha);
++
+ 	bool tieneDependencias() const;
+ 	void mostrar() const;
+ };
+diff --git a/Despacho.cpp b/Despacho.cpp
+index e0d1474..4bf023a 100644
+--- a/Despacho.cpp
++++ b/Despacho.cpp
+@@ -5,6 +5,9 @@ Despacho::Despacho(const string& codigo, Colaborador* responsable,
+ 	fechaFinalizacion(0, 0, 0) {
+ 	this->codigo = codigo;
+ 	this->solicitud = nullptr;
++	this->cliente = nullptr;
++	this->centroOrigen = "";
++	this->destino = "";
+ 	this->responsable = responsable;
+ 	estado = EstadoDespacho::EN_PROCESO;
+ }
+@@ -14,6 +17,9 @@ Despacho::Despacho(const string& codigo, SolicitudEnvio* solicitud,
+ 	fechaCreacion(fechaCreacion), fechaFinalizacion(0, 0, 0) {
+ 	this->codigo = codigo;
+ 	this->solicitud = solicitud;
++	this->cliente = solicitud == nullptr ? nullptr : solicitud->getCliente();
++	this->centroOrigen = solicitud == nullptr ? string("") : solicitud->getOrigen();
++	this->destino = solicitud == nullptr ? string("") : solicitud->getDestino();
+ 	this->responsable = responsable;
+ 	estado = EstadoDespacho::EN_PROCESO;
+ }
+@@ -31,14 +37,32 @@ Fecha Despacho::getFechaFinalizacion() const { return fechaFinalizacion; }
+ int Despacho::getEstado() const { return estado; }
+ const ListaEnlazada<Paquete>& Despacho::getPaquetes() const { return paquetes; }
+ 
++Cliente* Despacho::getCliente() const {
++	return cliente;
++}
++
++Paquete* Despacho::getPaquete() const {
++	Nodo<Paquete>* primero = paquetes.getPrimero();
++	return primero == nullptr ? nullptr : primero->getDato();
++}
++
++string Despacho::getCentroOrigen() const {
++	return centroOrigen;
++}
++
++string Despacho::getDestino() const {
++	return destino;
++}
++
+ bool Despacho::agregarPaquete(Paquete* paquete) {
+ 	if (paquete == nullptr || estado == EstadoDespacho::FINALIZADO) return false;
++	if (!paquetes.estaVacia()) return false; // un despacho maneja un paquete
+ 	if (contienePaquete(paquete)) return false;
+ 	paquetes.insertarFinal(paquete);
+ 	return true;
+ }
+ 
+-bool Despacho::contienePaquete(Paquete* paquete) const {
++bool Despacho::contienePaquete(const Paquete* paquete) const {
+ 	for (Nodo<Paquete>* nodo = paquetes.getPrimero(); nodo != nullptr;
+ 		nodo = nodo->getSiguiente()) {
+ 		if (nodo->getDato() == paquete) return true;
+@@ -47,7 +71,7 @@ bool Despacho::contienePaquete(Paquete* paquete) const {
+ }
+ 
+ bool Despacho::finalizar(const Fecha& fecha) {
+-	if (estado == EstadoDespacho::FINALIZADO || !fecha.esValida()) return false;
++	if (estado != EstadoDespacho::EN_PROCESO || !fecha.esValida()) return false;
+ 	estado = EstadoDespacho::FINALIZADO;
+ 	fechaFinalizacion = fecha;
+ 	return true;
+@@ -56,5 +80,33 @@ bool Despacho::finalizar(const Fecha& fecha) {
+ void Despacho::mostrar() const {
+ 	cout << "Despacho: " << codigo << endl;
+ 	cout << "Estado: " << EstadoDespacho::toString(estado) << endl;
+-	cout << "Paquetes: " << paquetes.getTamano() << endl;
++
++	if (solicitud != nullptr) {
++		cout << "Solicitud: " << solicitud->getCodigo()
++			<< " (" << EstadoSolicitud::toString(solicitud->getEstado()) << ")"
++			<< endl;
++	}
++	cout << "Centro de origen: " << centroOrigen << endl;
++	cout << "Destino: " << destino << endl;
++	if (cliente != nullptr) {
++		cout << "Cliente: " << cliente->getNombre()
++			<< " (" << cliente->getIdentificacion() << ")" << endl;
++	}
++
++	Paquete* paquete = getPaquete();
++	cout << "Paquete: " << (paquete == nullptr ? "(sin paquete)" : paquete->getCodigo())
++		<< endl;
++
++	if (responsable != nullptr) {
++		cout << "Responsable: " << responsable->getNombreCompleto()
++			<< " (" << responsable->getIdentificacion() << ")" << endl;
++	}
++
++	cout << "Fecha de despacho: " << fechaCreacion.toString()
++		<< " " << fechaCreacion.horaToString() << endl;
++
++	if (estado == EstadoDespacho::FINALIZADO) {
++		cout << "Fecha de finalizacion: " << fechaFinalizacion.toString()
++			<< " " << fechaFinalizacion.horaToString() << endl;
++	}
+ }
+diff --git a/Despacho.h b/Despacho.h
+index f54a6ca..16dacc5 100644
+--- a/Despacho.h
++++ b/Despacho.h
+@@ -14,6 +14,9 @@ class Despacho {
+ private:
+ 	string codigo;
+ 	SolicitudEnvio* solicitud;
++	Cliente* cliente;
++	string centroOrigen;
++	string destino;
+ 	Colaborador* responsable;
+ 	Fecha fechaCreacion;
+ 	Fecha fechaFinalizacion;
+@@ -35,8 +38,14 @@ public:
+ 	int getEstado() const;
+ 	const ListaEnlazada<Paquete>& getPaquetes() const;
+ 
++	// Datos derivados de la solicitud asociada (con verificacion de nulos).
++	Cliente* getCliente() const;
++	Paquete* getPaquete() const;
++	string getCentroOrigen() const;
++	string getDestino() const;
++
+ 	bool agregarPaquete(Paquete* paquete);
+-	bool contienePaquete(Paquete* paquete) const;
++	bool contienePaquete(const Paquete* paquete) const;
+ 	bool finalizar(const Fecha& fecha);
+ 	void mostrar() const;
+ };
+diff --git a/Menu.cpp b/Menu.cpp
+index acb1c27..5661125 100644
+--- a/Menu.cpp
++++ b/Menu.cpp
+@@ -1,5 +1,20 @@
+ #include "Menu.h"
+ 
++// Quita espacios en blanco al inicio y al final de un texto.
++static string recortar(const string& texto) {
++    size_t inicio = 0;
++    size_t fin = texto.size();
++    while (inicio < fin && (texto[inicio] == ' ' || texto[inicio] == '\t' ||
++        texto[inicio] == '\n' || texto[inicio] == '\r')) {
++        inicio++;
++    }
++    while (fin > inicio && (texto[fin - 1] == ' ' || texto[fin - 1] == '\t' ||
++        texto[fin - 1] == '\n' || texto[fin - 1] == '\r')) {
++        fin--;
++    }
++    return texto.substr(inicio, fin - inicio);
++}
++
+ Menu::Menu(SistemaTicoPack* sistema) {
+     this->sistema = sistema;
+ }
+@@ -11,7 +26,7 @@ void Menu::limpiarPantalla() const {
+ 
+ void Menu::pausar() const {
+     cout << "\n[Presione ENTER para continuar...]";
+-    cin.ignore(10000, '\n');
++    cin.clear();
+     cin.get();
+ }
+ 
+@@ -26,6 +41,7 @@ string Menu::leerTexto(const string& mensaje) const {
+         cout << mensaje;
+         cin >> ws;
+         getline(cin, texto);
++        texto = recortar(texto);
+         if (!Validador::textoValido(texto)) {
+             cout << "[Error] El campo no puede estar vacio. Intente de nuevo.\n";
+         }
+@@ -53,7 +69,10 @@ double Menu::leerDecimal(const string& mensaje) const {
+     while (true) {
+         cout << mensaje;
+         cin >> valor;
+-        if (!cin.fail()) {
++        // Sin <cmath>: se descartan NaN e infinito comparando con el mayor
++        // valor double representable de forma segura.
++        bool esFinito = valor <= 1.0e308 && valor >= -1.0e308;
++        if (!cin.fail() && esFinito) {
+             cin.ignore(10000, '\n');
+             return valor;
+         }
+@@ -118,7 +137,7 @@ void Menu::mostrarOpciones() const {
+     cout << " 2. Gestion de Clientes\n";
+     cout << " 3. Gestion de Colaboradores\n";
+     cout << " 4. Bodegas y Matrices de Almacenamiento\n";
+-    cout << " 5. Paquetes, Almacenamiento y Reubicacion\n";
++    cout << " 5. Paquetes, Almacenamiento, Reubicacion y Estados\n";
+     cout << " 6. Solicitudes de Envio\n";
+     cout << " 7. Gestion de Despachos y Entregas\n";
+     cout << " 8. Reportes del Sistema\n";
+@@ -169,6 +188,10 @@ void Menu::menuCentros() {
+             if (eliminado) confirmarAccion("Centro eliminado exitosamente.");
+             else { cout << "[Error] No se puede eliminar el centro (verifique dependencias).\n"; pausar(); }
+         }
++        else if (opcion != 0) {
++            cout << "[Error] Opcion invalida.\n";
++            pausar();
++        }
+     } while (opcion != 0);
+ }
+ 
+@@ -242,6 +265,10 @@ void Menu::menuClientes() {
+             if (eliminado) confirmarAccion("Cliente eliminado correctamente.");
+             else { cout << "[Error] No se puede eliminar el cliente (puede tener paquetes o solicitudes asociadas).\n"; pausar(); }
+         }
++        else if (opcion != 0) {
++            cout << "[Error] Opcion invalida.\n";
++            pausar();
++        }
+     } while (opcion != 0);
+ }
+ 
+@@ -294,6 +321,10 @@ void Menu::menuColaboradores() {
+             if (eliminado) confirmarAccion("Colaborador eliminado.");
+             else { cout << "[Error] No se puede eliminar (el colaborador tiene registros activos o bitácoras asociadas).\n"; pausar(); }
+         }
++        else if (opcion != 0) {
++            cout << "[Error] Opcion invalida.\n";
++            pausar();
++        }
+     } while (opcion != 0);
+ }
+ 
+@@ -306,7 +337,7 @@ void Menu::menuBodegas() {
+         cout << "==================================================\n";
+         cout << "          MODULO: BODEGAS Y MATRICES              \n";
+         cout << "==================================================\n";
+-        cout << " 1. Registrar bodega\n 2. Buscar bodega\n 3. Consultar matriz grafica\n 4. Eliminar bodega\n 0. Regresar\n";
++        cout << " 1. Registrar bodega\n 2. Buscar bodega\n 3. Consultar matriz grafica\n 4. Mostrar todas las bodegas\n 5. Eliminar bodega\n 0. Regresar\n";
+         cout << "==================================================\n";
+         opcion = leerEntero("Seleccione una opcion: ");
+ 
+@@ -349,11 +380,26 @@ void Menu::menuBodegas() {
+             pausar();
+         }
+         else if (opcion == 4) {
++            cout << "\n--- LISTA DE BODEGAS DEL CENTRO ---\n";
++            Nodo<Bodega>* n = centro->getBodegas().getPrimero();
++            if (n == nullptr) cout << "No hay bodegas registradas.\n";
++            while (n != nullptr) {
++                n->getDato()->mostrarDatos();
++                cout << "-----------------------------------\n";
++                n = n->getSiguiente();
++            }
++            pausar();
++        }
++        else if (opcion == 5) {
+             string codigo = leerTexto("Codigo de bodega a eliminar: ");
+             bool eliminado = centro->eliminarBodega(codigo);
+             if (eliminado) confirmarAccion("Bodega eliminada correctamente.");
+             else { cout << "[Error] No se puede eliminar (verifique que todas las celdas estén libres y sin paquetes asignados).\n"; pausar(); }
+         }
++        else if (opcion != 0) {
++            cout << "[Error] Opcion invalida.\n";
++            pausar();
++        }
+     } while (opcion != 0);
+ }
+ 
+@@ -366,14 +412,22 @@ void Menu::menuPaquetes() {
+         cout << "==================================================\n";
+         cout << "          MODULO: GESTION DE PAQUETES             \n";
+         cout << "==================================================\n";
+-        cout << " 1. Registrar paquete\n 2. Buscar paquete\n 3. Almacenar paquete\n 4. Reubicar paquete\n 5. Mostrar paquetes\n 6. Eliminar paquete\n 0. Regresar\n";
++        cout << " 1. Registrar paquete\n";
++        cout << " 2. Buscar paquete\n";
++        cout << " 3. Almacenar paquete\n";
++        cout << " 4. Reubicar paquete\n";
++        cout << " 5. Mostrar paquetes\n";
++        cout << " 6. Eliminar paquete\n";
++        cout << " 7. Reportar incidencia\n";
++        cout << " 8. Resolver incidencia\n";
++        cout << " 0. Regresar\n";
+         cout << "==================================================\n";
+         opcion = leerEntero("Seleccione una opcion: ");
+ 
+         if (opcion == 1) {
+             string codigo = leerTexto("Codigo unico global del paquete: ");
+-            if (centro->buscarPaquete(codigo) != nullptr) {
+-                cout << "[Error] El codigo de paquete ya existe en este centro.\n";
++            if (sistema->buscarPaqueteGlobal(codigo) != nullptr) {
++                cout << "[Error] Ya existe un paquete con ese codigo en el sistema.\n";
+                 pausar();
+                 continue;
+             }
+@@ -388,7 +442,8 @@ void Menu::menuPaquetes() {
+             double peso = leerDecimal("Peso en kg (>0): ");
+             int categoria = leerEntero("Categoria (1: General, 2: Fragil, 3: Tecnologia, 4: Documentos): ");
+ 
+-            if (!Categoria::esValida(categoria) || peso <= 0 || descripcion.empty()) {
++            if (!Categoria::esValida(categoria) || peso <= 0 ||
++                !Paquete::datosValidos(codigo, descripcion, peso)) {
+                 cout << "[Error] Datos del paquete invalidos (verifique peso y categoria).\n";
+                 pausar();
+                 continue;
+@@ -397,6 +452,7 @@ void Menu::menuPaquetes() {
+             if (!centro->agregarPaquete(p)) {
+                 delete p;
+                 cout << "[Error] No se pudo registrar el paquete.\n";
++                pausar();
+             }
+             else {
+                 confirmarAccion("Paquete registrado con estado RECIBIDO.");
+@@ -410,25 +466,132 @@ void Menu::menuPaquetes() {
+         }
+         else if (opcion == 3) {
+             Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete a almacenar: "));
+-            Bodega* b = centro->buscarBodega(leerTexto("Codigo de bodega compatible: "));
++            if (p == nullptr) {
++                cout << "[Aviso] Paquete no encontrado.\n";
++                pausar();
++                continue;
++            }
++
++            bool puedeAlmacenarse = (p->getEstado() == EstadoPaquete::RECIBIDO);
++            if (p->getEstado() == EstadoPaquete::INCIDENCIA &&
++                !p->tieneUbicacion() &&
++                p->getEstadoPreIncidencia() == EstadoPaquete::RECIBIDO) {
++                puedeAlmacenarse = true;
++            }
++            if (!puedeAlmacenarse) {
++                cout << "[Error] Solo se pueden almacenar paquetes en estado Recibido "
++                    << "o con una incidencia originada antes de almacenarse.\n";
++                pausar();
++                continue;
++            }
++
++            cout << "\n--- BODEGAS COMPATIBLES CON LA CATEGORIA "
++                << Categoria::toString(p->getCategoria()) << " ---\n";
++            bool hayCompatibles = false;
++            for (Nodo<Bodega>* nodo = centro->getBodegas().getPrimero();
++                nodo != nullptr; nodo = nodo->getSiguiente()) {
++                Bodega* bodega = nodo->getDato();
++                if (bodega->esCompatible(p->getCategoria()) &&
++                    bodega->celdasLibres() > 0) {
++                    hayCompatibles = true;
++                    bodega->mostrarCeldasDisponibles();
++                }
++            }
++            if (!hayCompatibles) {
++                cout << "[Error] No existe una bodega compatible con espacio disponible.\n";
++                pausar();
++                continue;
++            }
++
++            Bodega* recomendada = centro->recomendarBodega(p->getCategoria());
++            Celda* celdaRecomendada = recomendada->primeraCeldaLibre();
++            cout << "\n[Recomendacion] Bodega " << recomendada->getCodigo()
++                << " (" << recomendada->getNombre() << "), celda "
++                << celdaRecomendada->getIdentificador()
++                << ", con " << recomendada->celdasLibres() << " celdas disponibles.\n";
++
++            Bodega* bodegaDestino = nullptr;
++            int fila = -1;
++            int columna = -1;
++            int decision = leerEntero("1. Aceptar recomendacion  2. Elegir otra celda: ");
++
++            if (decision == 1) {
++                bodegaDestino = recomendada;
++                fila = celdaRecomendada->getFila();
++                columna = celdaRecomendada->getColumna();
++            }
++            else if (decision == 2) {
++                string codigoBodega = leerTexto("Codigo de la bodega compatible: ");
++                bodegaDestino = centro->buscarBodega(codigoBodega);
++                if (bodegaDestino == nullptr ||
++                    !bodegaDestino->esCompatible(p->getCategoria()) ||
++                    bodegaDestino->celdasLibres() <= 0) {
++                    cout << "[Error] Bodega inexistente o no compatible con espacio disponible.\n";
++                    pausar();
++                    continue;
++                }
++                bodegaDestino->mostrarCeldasDisponibles();
++                fila = leerEntero("Fila de la celda destino: ");
++                columna = leerEntero("Columna de la celda destino: ");
++            }
++            else {
++                cout << "[Error] Opcion no valida.\n";
++                pausar();
++                continue;
++            }
++
+             Colaborador* c = seleccionarColaborador(centro);
+-            if (p != nullptr && b != nullptr && c != nullptr) {
+-                bool almacenado = centro->almacenarPaquete(p, b, c, leerFecha("Fecha de almacenamiento"));
+-                if (almacenado) confirmarAccion("Paquete almacenado correctamente en celda asignada.");
+-                else { cout << "[Error] No se pudo almacenar (verifique compatibilidad de categoría o espacio disponible).\n"; pausar(); }
++            if (c == nullptr) { pausar(); continue; }
++
++            bool almacenado = centro->almacenarPaquete(p, bodegaDestino, fila,
++                columna, c, leerFecha("Fecha de almacenamiento"));
++            if (almacenado) {
++                confirmarAccion("Paquete almacenado correctamente en la celda indicada.");
++            }
++            else {
++                cout << "[Error] No se pudo almacenar (celda ocupada, bodega incompatible o datos invalidos).\n";
++                pausar();
+             }
+-            else { pausar(); }
+         }
+         else if (opcion == 4) {
+             Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete a reubicar: "));
++            if (p == nullptr) {
++                cout << "[Aviso] Paquete no encontrado.\n";
++                pausar();
++                continue;
++            }
++            if (p->getEstado() != EstadoPaquete::ALMACENADO ||
++                !p->tieneUbicacion()) {
++                cout << "[Error] Solo se pueden reubicar paquetes Almacenados con celda asignada.\n";
++                pausar();
++                continue;
++            }
++
++            cout << "Ubicacion actual: bodega " << p->getCodigoBodega()
++                << ", fila " << p->getFila() << ", columna " << p->getColumna()
++                << endl;
++            cout << "\n--- BODEGAS COMPATIBLES CON CELDAS DISPONIBLES ---\n";
++            for (Nodo<Bodega>* nodo = centro->getBodegas().getPrimero();
++                nodo != nullptr; nodo = nodo->getSiguiente()) {
++                Bodega* bodega = nodo->getDato();
++                if (bodega->esCompatible(p->getCategoria()) &&
++                    bodega->celdasLibres() > 0) {
++                    bodega->mostrarCeldasDisponibles();
++                }
++            }
++
+             Bodega* b = centro->buscarBodega(leerTexto("Codigo de bodega destino: "));
++            if (b == nullptr) {
++                cout << "[Error] Bodega no encontrada.\n";
++                pausar();
++                continue;
++            }
+             int fila = leerEntero("Fila destino: ");
+             int col = leerEntero("Columna destino: ");
+-            if (p != nullptr && b != nullptr) {
+-                bool reubicado = centro->reubicarPaquete(p, b, fila, col);
+-                if (reubicado) confirmarAccion("Paquete reubicado exitosamente.");
+-                else { cout << "[Error] No se pudo reubicar (celda ocupada, incompatible o inexistente).\n"; pausar(); }
+-            }
++
++            bool reubicado = centro->reubicarPaquete(p, b, fila, col);
++            if (reubicado) confirmarAccion("Paquete reubicado exitosamente.");
++            else { cout << "[Error] No se pudo reubicar (celda ocupada, incompatible o inexistente).\n"; pausar(); }
+         }
+         else if (opcion == 5) {
+             cout << "\n--- LISTA DE PAQUETES DEL CENTRO ---\n";
+@@ -443,6 +606,68 @@ void Menu::menuPaquetes() {
+             if (eliminado) confirmarAccion("Paquete eliminado.");
+             else { cout << "[Error] No se puede eliminar (solo paquetes en Recibido sin celda, solicitudes o despachos).\n"; pausar(); }
+         }
++        else if (opcion == 7) {
++            Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete con incidencia: "));
++            if (p == nullptr) {
++                cout << "[Aviso] Paquete no encontrado.\n";
++                pausar();
++                continue;
++            }
++            int estado = p->getEstado();
++            if (estado != EstadoPaquete::RECIBIDO &&
++                estado != EstadoPaquete::ALMACENADO &&
++                estado != EstadoPaquete::EN_TRANSITO) {
++                cout << "[Error] No se puede reportar incidencia en el estado actual ("
++                    << EstadoPaquete::toString(estado) << ").\n";
++                pausar();
++                continue;
++            }
++            Colaborador* c = seleccionarColaborador(centro);
++            if (c == nullptr) { pausar(); continue; }
++            bool reportada = centro->reportarIncidencia(p, c,
++                leerFecha("Fecha de la incidencia"));
++            if (reportada) {
++                confirmarAccion("Incidencia registrada. La ubicacion actual se conserva si corresponde.");
++            }
++            else {
++                cout << "[Error] No se pudo registrar la incidencia.\n";
++                pausar();
++            }
++        }
++        else if (opcion == 8) {
++            Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete en incidencia: "));
++            if (p == nullptr) {
++                cout << "[Aviso] Paquete no encontrado.\n";
++                pausar();
++                continue;
++            }
++            if (p->getEstado() != EstadoPaquete::INCIDENCIA) {
++                cout << "[Error] El paquete no se encuentra en estado Incidencia.\n";
++                pausar();
++                continue;
++            }
++
++            int estadoPrevio = p->getEstadoPreIncidencia();
++            if (estadoPrevio == EstadoPaquete::RECIBIDO) {
++                cout << "[Aviso] La incidencia ocurrio antes de almacenar. "
++                    << "Use la opcion 3 (Almacenar paquete) para asignarle una celda.\n";
++                pausar();
++                continue;
++            }
++
++            cout << "Al resolver la incidencia el paquete volvera a "
++                << EstadoPaquete::toString(estadoPrevio) << ".\n";
++            Colaborador* c = seleccionarColaborador(centro);
++            if (c == nullptr) { pausar(); continue; }
++            bool resuelta = centro->resolverIncidencia(p, c,
++                leerFecha("Fecha de resolucion de la incidencia"));
++            if (resuelta) confirmarAccion("Incidencia resuelta correctamente.");
++            else { cout << "[Error] No se pudo resolver la incidencia (verifique el despacho y la celda).\n"; pausar(); }
++        }
++        else if (opcion != 0) {
++            cout << "[Error] Opcion invalida.\n";
++            pausar();
++        }
+     } while (opcion != 0);
+ }
+ 
+@@ -455,37 +680,56 @@ void Menu::menuSolicitudes() {
+         cout << "==================================================\n";
+         cout << "          MODULO: SOLICITUDES DE ENVIO            \n";
+         cout << "==================================================\n";
+-        cout << " 1. Crear solicitud de envio\n 2. Buscar solicitud\n 3. Aprobar solicitud (Crea despacho)\n 4. Rechazar solicitud\n 5. Anular solicitud\n 0. Regresar\n";
++        cout << " 1. Crear solicitud de envio\n";
++        cout << " 2. Buscar solicitud\n";
++        cout << " 3. Aprobar solicitud (Crea despacho)\n";
++        cout << " 4. Rechazar solicitud\n";
++        cout << " 5. Anular solicitud\n";
++        cout << " 6. Mostrar todas las solicitudes\n";
++        cout << " 0. Regresar\n";
+         cout << "==================================================\n";
+         opcion = leerEntero("Seleccione una opcion: ");
+ 
+         if (opcion == 1) {
+             Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete (debe estar Almacenado): "));
+-            Colaborador* c = seleccionarColaborador(centro);
+-            if (p == nullptr || c == nullptr) { pausar(); continue; }
++            if (p == nullptr) {
++                cout << "[Aviso] Paquete no encontrado.\n";
++                pausar();
++                continue;
++            }
+             if (p->getEstado() != EstadoPaquete::ALMACENADO) {
+                 cout << "[Error] El paquete no se encuentra en estado Almacenado.\n";
+                 pausar();
+                 continue;
+             }
++            Colaborador* c = seleccionarColaborador(centro);
++            if (c == nullptr) { pausar(); continue; }
++
+             Cliente* cliente = p->getPropietario();
+             string codigo = leerTexto("Codigo unico de la solicitud: ");
+-            if (centro->buscarSolicitud(codigo) != nullptr) {
+-                cout << "[Error] Ya existe una solicitud con ese codigo en este centro.\n";
++            if (sistema->buscarSolicitudGlobal(codigo) != nullptr) {
++                cout << "[Error] Ya existe una solicitud con ese codigo en el sistema.\n";
+                 pausar();
+                 continue;
+             }
+-            double tarifaBase = Tarifas::calcular(p->getPeso(), p->getCategoria(), 0);
+-            double costoFinal = cliente->calcularCostoFinal(tarifaBase);
++
++            double costoBase = Tarifas::calcular(p->getPeso(), p->getCategoria());
++            double costoFinal = cliente->calcularCostoFinal(costoBase);
+             string destino = leerTexto("Descripcion del destino de entrega: ");
++            Fecha fechaSolicitud = leerFecha("Fecha de solicitud");
+ 
+-            SolicitudEnvio* s = new SolicitudEnvio(codigo, cliente, p, c, centro->getCodigo(), destino, 0, leerFecha("Fecha de solicitud"), costoFinal);
++            SolicitudEnvio* s = new SolicitudEnvio(codigo, cliente, p, c,
++                centro->getCodigo(), destino, 0, fechaSolicitud, costoFinal);
+             if (!centro->agregarSolicitud(s)) {
+                 delete s;
+-                cout << "[Error] No se pudo crear la solicitud (el paquete ya posee una solicitud pendiente).\n";
++                cout << "[Error] No se pudo crear la solicitud (el paquete ya posee "
++                    << "una solicitud pendiente o un despacho asociado).\n";
++                pausar();
+             }
+             else {
+-                confirmarAccion("Solicitud creada con estado PENDIENTE. Costo estimado calculado.");
++                cout << "Costo base: " << costoBase << " | Costo final: "
++                    << costoFinal << endl;
++                confirmarAccion("Solicitud creada con estado PENDIENTE.");
+             }
+         }
+         else if (opcion == 2) {
+@@ -496,20 +740,56 @@ void Menu::menuSolicitudes() {
+         }
+         else if (opcion == 3) {
+             SolicitudEnvio* s = centro->buscarSolicitud(leerTexto("Codigo de solicitud a aprobar: "));
+-            if (s != nullptr) {
+-                bool aprobado = centro->aprobarSolicitud(s, s->getResponsable(), leerFecha("Fecha de aprobacion"));
+-                if (aprobado) confirmarAccion("Solicitud aprobada con exito. Despacho creado y paquete en transito.");
+-                else { cout << "[Error] No se pudo aprobar la solicitud.\n"; pausar(); }
++            if (s == nullptr) {
++                cout << "[Aviso] Solicitud no encontrada.\n";
++                pausar();
++                continue;
++            }
++            if (s->getEstado() != EstadoSolicitud::PENDIENTE) {
++                cout << "[Error] Solo se pueden aprobar solicitudes Pendientes.\n";
++                pausar();
++                continue;
++            }
++            Colaborador* c = seleccionarColaborador(centro);
++            if (c == nullptr) { pausar(); continue; }
++            bool aprobado = centro->aprobarSolicitud(s, c,
++                leerFecha("Fecha de aprobacion"));
++            if (aprobado) {
++                confirmarAccion("Solicitud aprobada con exito. Despacho creado y paquete en transito.");
++            }
++            else {
++                cout << "[Error] No se pudo aprobar la solicitud (verifique que el paquete "
++                    << "siga Almacenado y no tenga otro despacho).\n";
++                pausar();
+             }
+         }
+         else if (opcion == 4 || opcion == 5) {
+             SolicitudEnvio* s = centro->buscarSolicitud(leerTexto("Codigo de solicitud: "));
+-            if (s != nullptr) {
+-                int nuevoEstadoInt = (opcion == 4) ? 2 : 3;
+-                bool cambiado = s->cambiarEstado(nuevoEstadoInt);
+-                if (cambiado) confirmarAccion("Estado de solicitud actualizado correctamente.");
+-                else { cout << "[Error] No se pudo cambiar el estado (la solicitud ya no esta pendiente).\n"; pausar(); }
++            if (s == nullptr) {
++                cout << "[Aviso] Solicitud no encontrada.\n";
++                pausar();
++                continue;
+             }
++            int nuevoEstado = (opcion == 4) ? EstadoSolicitud::RECHAZADA :
++                EstadoSolicitud::ANULADA;
++            bool cambiado = s->cambiarEstado(nuevoEstado);
++            if (cambiado) confirmarAccion("Estado de solicitud actualizado correctamente.");
++            else { cout << "[Error] No se pudo cambiar el estado (la solicitud ya no esta pendiente).\n"; pausar(); }
++        }
++        else if (opcion == 6) {
++            cout << "\n--- LISTA DE SOLICITUDES DEL CENTRO ---\n";
++            Nodo<SolicitudEnvio>* n = centro->getSolicitudes().getPrimero();
++            if (n == nullptr) cout << "No hay solicitudes registradas.\n";
++            while (n != nullptr) {
++                n->getDato()->mostrar();
++                cout << "-----------------------------------\n";
++                n = n->getSiguiente();
++            }
++            pausar();
++        }
++        else if (opcion != 0) {
++            cout << "[Error] Opcion invalida.\n";
++            pausar();
+         }
+     } while (opcion != 0);
+ }
+@@ -542,12 +822,21 @@ void Menu::menuDespachos() {
+         }
+         else if (opcion == 3) {
+             Despacho* d = centro->buscarDespacho(leerTexto("Codigo de despacho a finalizar: "));
+-            Colaborador* c = seleccionarColaborador(centro);
+-            if (d != nullptr && c != nullptr) {
+-                bool finalizado = centro->finalizarDespacho(d, leerFecha("Fecha de finalizacion"), c);
+-                if (finalizado) confirmarAccion("Entrega finalizada con exito. Paquete ENTREGADO.");
+-                else { cout << "[Error] No se pudo finalizar (verifique que el despacho este En proceso y el paquete En transito).\n"; pausar(); }
++            if (d == nullptr) {
++                cout << "[Aviso] Despacho no encontrado.\n";
++                pausar();
++                continue;
+             }
++            Colaborador* c = seleccionarColaborador(centro);
++            if (c == nullptr) { pausar(); continue; }
++            bool finalizado = centro->finalizarDespacho(d,
++                leerFecha("Fecha de finalizacion"), c);
++            if (finalizado) confirmarAccion("Entrega finalizada con exito. Paquete ENTREGADO.");
++            else { cout << "[Error] No se pudo finalizar (verifique que el despacho este En proceso y el paquete En transito).\n"; pausar(); }
++        }
++        else if (opcion != 0) {
++            cout << "[Error] Opcion invalida.\n";
++            pausar();
+         }
+     } while (opcion != 0);
+ }
+diff --git a/Paquete.cpp b/Paquete.cpp
+index 8309197..2c4e499 100644
+--- a/Paquete.cpp
++++ b/Paquete.cpp
+@@ -26,13 +26,19 @@ Paquete::Paquete(const string& codigo, const string& descripcion, double peso,
+     this->peso = peso;
+     this->categoria = categoria;
+     this->propietario = propietario;
++    codigoCentro = "";
+     estado = EstadoPaquete::RECIBIDO;
+     codigoBodega = "";
+     fila = -1;
+     columna = -1;
+ }
+ 
++void Paquete::asignarCentro(const string& nuevoCodigoCentro) {
++    codigoCentro = nuevoCodigoCentro;
++}
++
+ string Paquete::getCodigo() const { return codigo; }
++string Paquete::getCodigoCentro() const { return codigoCentro; }
+ string Paquete::getDescripcion() const { return descripcion; }
+ double Paquete::getPeso() const { return peso; }
+ int Paquete::getCategoria() const { return categoria; }
+@@ -59,13 +65,18 @@ int Paquete::getEstadoPreIncidencia() const {
+         return estado;
+     }
+ 
+-    // El ultimo registro es el que llevo el paquete a INCIDENCIA.
+-    int anterior = estado;
++    // El ultimo registro es el que llevo el paquete a INCIDENCIA; su estado
++    // anterior indica el estado que se debe recuperar al resolverla.
++    RegistroBitacora* ultimo = nullptr;
+     for (Nodo<RegistroBitacora>* n = bitacora.getPrimero(); n != nullptr;
+         n = n->getSiguiente()) {
+-        anterior = n->getDato()->getEstadoAnterior();
++        ultimo = n->getDato();
++    }
++    if (ultimo != nullptr &&
++        ultimo->getNuevoEstado() == EstadoPaquete::INCIDENCIA) {
++        return ultimo->getEstadoAnterior();
+     }
+-    return anterior;
++    return estado;
+ }
+ 
+ void Paquete::registrarBitacora(int anterior, int nuevo,
+@@ -105,9 +116,17 @@ bool Paquete::cambiarEstado(int nuevo, Colaborador* responsable,
+             estado == EstadoPaquete::ALMACENADO ||
+             estado == EstadoPaquete::EN_TRANSITO);
+     }
+-    else if (estado == EstadoPaquete::INCIDENCIA &&
+-        nuevo == EstadoPaquete::ALMACENADO) {
+-        permitido = tieneUbicacion();
++    else if (estado == EstadoPaquete::INCIDENCIA) {
++        if (nuevo == EstadoPaquete::ALMACENADO) {
++            // Solo si la incidencia ocurrio estando almacenado y la celda
++            // asignada se conserva.
++            permitido = tieneUbicacion();
++        }
++        else if (nuevo == EstadoPaquete::EN_TRANSITO) {
++            // Incidencia ocurrida durante un despacho En proceso: el paquete
++            // no tiene celda y puede volver a En transito.
++            permitido = !tieneUbicacion();
++        }
+     }
+ 
+     if (!permitido) return false;
+@@ -120,6 +139,8 @@ void Paquete::mostrar() const {
+     cout << "Peso: " << peso << " kg" << endl;
+     cout << "Categoria: " << Categoria::toString(categoria) << endl;
+     cout << "Estado: " << EstadoPaquete::toString(estado) << endl;
++    cout << "Centro: " << (codigoCentro.empty() ? "(sin asignar)" : codigoCentro)
++        << endl;
+ 
+     if (propietario != nullptr) {
+         cout << "Propietario: " << propietario->getNombre()
+diff --git a/Paquete.h b/Paquete.h
+index 4cb3e15..5040f65 100644
+--- a/Paquete.h
++++ b/Paquete.h
+@@ -19,6 +19,7 @@ private:
+     int categoria;      // valor de Categoria (1 a 4)
+     int estado;         // valor de EstadoPaquete
+     Cliente* propietario;
++    string codigoCentro; // centro de distribucion al que pertenece
+     string codigoBodega; // vacio si no tiene ubicacion
+     int fila;            // -1 si no tiene ubicacion
+     int columna;         // -1 si no tiene ubicacion
+@@ -46,6 +47,11 @@ public:
+     Paquete(const string& codigo, const string& descripcion, double peso,
+         int categoria, Cliente* propietario);
+ 
++    // Centro de distribucion al que pertenece el paquete. Lo asigna
++    // CentroDistribucion al registrarlo.
++    void asignarCentro(const string& nuevoCodigoCentro);
++    string getCodigoCentro() const;
++
+     string getCodigo() const;
+     string getDescripcion() const;
+     double getPeso() const;
+diff --git a/Reportes.cpp b/Reportes.cpp
+index d608802..dca97e4 100644
+--- a/Reportes.cpp
++++ b/Reportes.cpp
+@@ -1,5 +1,13 @@
+ #include "Reportes.h"
+ 
++// Texto con 2 decimales, ej. 33.33%
++static string textoPorcentaje(double valor) {
++    long v = (long)(valor * 100 + 0.5);
++    long decimales = v % 100;
++    return to_string(v / 100) + "." + (decimales < 10 ? "0" : "") +
++        to_string(decimales) + "%";
++}
++
+ void Reportes::resumenCentro(const CentroDistribucion& centro) {
+     cout << "Reporte del centro de distribucion" << endl;
+     cout << "Codigo: " << centro.getCodigo() << endl;
+@@ -41,13 +49,26 @@ void Reportes::estadoPaquetes(const CentroDistribucion& centro) {
+ }
+ 
+ void Reportes::ocupacionBodegas(const CentroDistribucion& centro) {
+-    cout << "Reporte de ocupacion de bodegas" << endl;
++    cout << "Reporte de ocupacion de bodegas del centro "
++        << centro.getCodigo() << " - " << centro.getNombre() << endl;
++
++    if (centro.getBodegas().estaVacia()) {
++        cout << "El centro no tiene bodegas registradas." << endl;
++        return;
++    }
++
+     for (Nodo<Bodega>* nodo = centro.getBodegas().getPrimero();
+         nodo != nullptr; nodo = nodo->getSiguiente()) {
+         Bodega* bodega = nodo->getDato();
+-        cout << bodega->getCodigo() << " - " << bodega->getNombre()
+-            << ": " << bodega->porcentajeOcupacion() << "% ocupado, "
+-            << bodega->celdasLibres() << " celdas libres" << endl;
++        cout << "Bodega " << bodega->getCodigo() << " - "
++            << bodega->getNombre() << " ("
++            << TipoBodega::toString(bodega->getTipo()) << ")" << endl;
++        cout << "  Total de celdas: " << bodega->totalCeldas() << endl;
++        cout << "  Celdas ocupadas: " << bodega->celdasOcupadas() << endl;
++        cout << "  Celdas disponibles: " << bodega->celdasLibres() << endl;
++        cout << "  Porcentaje de ocupacion: "
++            << textoPorcentaje(bodega->porcentajeOcupacion()) << endl;
++        cout << "-----------------------------------" << endl;
+     }
+ }
+ 
+@@ -55,29 +76,51 @@ void Reportes::historialCliente(const CentroDistribucion& centro,
+     Cliente* cliente) {
+     if (cliente == nullptr) return;
+ 
+-    cout << "Historial de " << cliente->getNombre() << endl;
++    cout << "Historial del cliente " << cliente->getNombre()
++        << " (" << cliente->getIdentificacion() << ")" << endl;
++    cout << "Centro: " << centro.getCodigo() << " - "
++        << centro.getNombre() << endl;
++
++    bool encontrado = false;
++
++    cout << "\nSolicitudes de envio:" << endl;
+     for (Nodo<SolicitudEnvio>* nodo = centro.getSolicitudes().getPrimero();
+         nodo != nullptr; nodo = nodo->getSiguiente()) {
+         SolicitudEnvio* solicitud = nodo->getDato();
+         if (solicitud->getCliente() == cliente) {
+-            cout << "Solicitud " << solicitud->getCodigo()
+-                << ", paquete " << solicitud->getPaquete()->getCodigo()
+-                << ", fecha " << solicitud->getFechaSolicitud().toString()
+-                << ", estado " << EstadoSolicitud::toString(solicitud->getEstado())
+-                << endl;
++            encontrado = true;
++            cout << "  Codigo: " << solicitud->getCodigo()
++                << " | Paquete: "
++                << (solicitud->getPaquete() == nullptr ? "(sin paquete)" :
++                    solicitud->getPaquete()->getCodigo())
++                << " | Fecha: " << solicitud->getFechaSolicitud().toString()
++                << " " << solicitud->getFechaSolicitud().horaToString()
++                << " | Estado: "
++                << EstadoSolicitud::toString(solicitud->getEstado()) << endl;
+         }
+     }
++
++    cout << "\nDespachos:" << endl;
+     for (Nodo<Despacho>* nodo = centro.getDespachos().getPrimero();
+         nodo != nullptr; nodo = nodo->getSiguiente()) {
+         Despacho* despacho = nodo->getDato();
+-        if (despacho->getSolicitud() != nullptr &&
+-            despacho->getSolicitud()->getCliente() == cliente) {
+-            cout << "Despacho " << despacho->getCodigo()
+-                << ", fecha " << despacho->getFechaCreacion().toString()
+-                << ", estado " << EstadoDespacho::toString(despacho->getEstado())
+-                << endl;
++        if (despacho->getCliente() == cliente) {
++            encontrado = true;
++            Paquete* paquete = despacho->getPaquete();
++            cout << "  Codigo: " << despacho->getCodigo()
++                << " | Paquete: "
++                << (paquete == nullptr ? "(sin paquete)" : paquete->getCodigo())
++                << " | Fecha: " << despacho->getFechaCreacion().toString()
++                << " " << despacho->getFechaCreacion().horaToString()
++                << " | Estado: "
++                << EstadoDespacho::toString(despacho->getEstado()) << endl;
+         }
+     }
++
++    if (!encontrado) {
++        cout << "\nEl cliente no tiene solicitudes ni despachos registrados."
++            << endl;
++    }
+ }
+ 
+ void Reportes::clientesPorEnvios(const CentroDistribucion& centro) {
+@@ -87,53 +130,53 @@ void Reportes::clientesPorEnvios(const CentroDistribucion& centro) {
+         return;
+     }
+ 
+-    // Reserva segura de memoria y inicialización explícita
+-    Cliente** orden = new Cliente * [cantidad]();
++    Cliente** orden = new Cliente * [cantidad];
++    int* conteos = new int[cantidad];
+     int indice = 0;
+ 
+     for (Nodo<Cliente>* nodo = centro.getClientes().getPrimero();
+         nodo != nullptr && indice < cantidad; nodo = nodo->getSiguiente()) {
+-        orden[indice++] = nodo->getDato();
+-    }
+-
+-    // Ordenamiento manual (Bubble Sort sin usar STL)
+-    for (int i = 0; i < cantidad - 1; i++) {
+-        for (int j = 0; j < cantidad - i - 1; j++) {
+-            int actual = 0;
+-            int siguiente = 0;
+-            for (Nodo<Despacho>* d = centro.getDespachos().getPrimero();
+-                d != nullptr; d = d->getSiguiente()) {
+-                if (d->getDato()->getEstado() == EstadoDespacho::FINALIZADO &&
+-                    d->getDato()->getSolicitud() != nullptr) {
+-                    Cliente* cliente = d->getDato()->getSolicitud()->getCliente();
+-                    if (cliente == orden[j]) actual++;
+-                    if (cliente == orden[j + 1]) siguiente++;
+-                }
+-            }
+-            if (actual < siguiente) {
+-                Cliente* temporal = orden[j];
+-                orden[j] = orden[j + 1];
+-                orden[j + 1] = temporal;
++        orden[indice] = nodo->getDato();
++        conteos[indice] = 0;
++        indice++;
++    }
++
++    // Contar despachos Finalizados por cliente.
++    for (Nodo<Despacho>* d = centro.getDespachos().getPrimero();
++        d != nullptr; d = d->getSiguiente()) {
++        if (d->getDato()->getEstado() != EstadoDespacho::FINALIZADO) continue;
++        Cliente* cliente = d->getDato()->getCliente();
++        for (int i = 0; i < cantidad; i++) {
++            if (orden[i] == cliente) {
++                conteos[i]++;
++                break;
+             }
+         }
+     }
+ 
+-    // Mostrar resultados
+-    for (int i = 0; i < cantidad; i++) {
+-        if (orden[i] == nullptr) continue;
+-        int finalizados = 0;
+-        for (Nodo<Despacho>* d = centro.getDespachos().getPrimero();
+-            d != nullptr; d = d->getSiguiente()) {
+-            if (d->getDato()->getEstado() == EstadoDespacho::FINALIZADO &&
+-                d->getDato()->getSolicitud() != nullptr &&
+-                d->getDato()->getSolicitud()->getCliente() == orden[i]) {
+-                finalizados++;
+-            }
++    // Ordenamiento por insercion, de mayor a menor. Solo se mueve un elemento
++    // cuando su conteo es estrictamente mayor, por lo que los empates
++    // conservan el orden original de la lista de clientes.
++    for (int i = 1; i < cantidad; i++) {
++        Cliente* clienteActual = orden[i];
++        int conteoActual = conteos[i];
++        int j = i - 1;
++        while (j >= 0 && conteos[j] < conteoActual) {
++            orden[j + 1] = orden[j];
++            conteos[j + 1] = conteos[j];
++            j--;
+         }
+-        cout << orden[i]->getNombre() << ": " << finalizados
+-            << " despachos finalizados" << endl;
++        orden[j + 1] = clienteActual;
++        conteos[j + 1] = conteoActual;
++    }
++
++    cout << "Clientes por cantidad de despachos finalizados" << endl;
++    for (int i = 0; i < cantidad; i++) {
++        cout << orden[i]->getNombre() << " (" << orden[i]->getIdentificacion()
++            << "): " << conteos[i] << " despachos finalizados" << endl;
+     }
+ 
++    delete[] conteos;
+     delete[] orden;
+ }
+ 
+@@ -145,30 +188,70 @@ void Reportes::bitacoraPaquete(Paquete* paquete) {
+ void Reportes::despachoDePaquete(const CentroDistribucion& centro,
+     Paquete* paquete) {
+     if (paquete == nullptr) return;
+-    for (Nodo<Despacho>* nodo = centro.getDespachos().getPrimero();
++
++    cout << "Consulta de despacho del paquete " << paquete->getCodigo() << endl;
++
++    SolicitudEnvio* solicitudAprobada = nullptr;
++    for (Nodo<SolicitudEnvio>* nodo = centro.getSolicitudes().getPrimero();
+         nodo != nullptr; nodo = nodo->getSiguiente()) {
+-        if (nodo->getDato()->contienePaquete(paquete)) {
+-            cout << "Despacho: " << nodo->getDato()->getCodigo() << endl;
+-            cout << "Fecha: " << nodo->getDato()->getFechaCreacion().toString() << endl;
+-            cout << "Estado: " << EstadoDespacho::toString(
+-                nodo->getDato()->getEstado()) << endl;
+-            return;
++        SolicitudEnvio* solicitud = nodo->getDato();
++        if (solicitud->getPaquete() == paquete &&
++            solicitud->getEstado() == EstadoSolicitud::APROBADA) {
++            solicitudAprobada = solicitud;
++            break;
+         }
+     }
+-    cout << "El paquete no tiene despacho asociado." << endl;
++
++    if (solicitudAprobada != nullptr) {
++        cout << "Solicitud aprobada: " << solicitudAprobada->getCodigo()
++            << " | Fecha: "
++            << solicitudAprobada->getFechaSolicitud().toString()
++            << " | Estado: "
++            << EstadoSolicitud::toString(solicitudAprobada->getEstado())
++            << endl;
++    }
++    else {
++        cout << "El paquete no tiene una solicitud aprobada." << endl;
++    }
++
++    Despacho* despacho = centro.buscarDespachoDePaquete(paquete);
++    if (despacho == nullptr) {
++        cout << "El paquete no tiene despacho asociado." << endl;
++        return;
++    }
++
++    cout << "Despacho: " << despacho->getCodigo()
++        << " | Fecha: " << despacho->getFechaCreacion().toString()
++        << " " << despacho->getFechaCreacion().horaToString()
++        << " | Estado: " << EstadoDespacho::toString(despacho->getEstado())
++        << endl;
+ }
+ 
+ void Reportes::despachosPorColaborador(const CentroDistribucion& centro,
+     Colaborador* colaborador) {
+     if (colaborador == nullptr) return;
++
++    cout << "Despachos gestionados por " << colaborador->getNombreCompleto()
++        << " (" << colaborador->getIdentificacion() << ")" << endl;
++
++    bool encontrado = false;
+     for (Nodo<Despacho>* nodo = centro.getDespachos().getPrimero();
+         nodo != nullptr; nodo = nodo->getSiguiente()) {
+         Despacho* despacho = nodo->getDato();
+         if (despacho->getResponsable() == colaborador) {
+-            cout << "Despacho: " << despacho->getCodigo()
+-                << ", fecha " << despacho->getFechaCreacion().toString()
+-                << ", estado " << EstadoDespacho::toString(despacho->getEstado())
+-                << endl;
++            encontrado = true;
++            Paquete* paquete = despacho->getPaquete();
++            cout << "  Codigo: " << despacho->getCodigo()
++                << " | Paquete: "
++                << (paquete == nullptr ? "(sin paquete)" : paquete->getCodigo())
++                << " | Fecha: " << despacho->getFechaCreacion().toString()
++                << " " << despacho->getFechaCreacion().horaToString()
++                << " | Estado: "
++                << EstadoDespacho::toString(despacho->getEstado()) << endl;
+         }
+     }
+-}
+\ No newline at end of file
++
++    if (!encontrado) {
++        cout << "El colaborador no tiene despachos registrados." << endl;
++    }
++}
+diff --git a/SistemaTicoPack.cpp b/SistemaTicoPack.cpp
+index 360aa2b..3daf74f 100644
+--- a/SistemaTicoPack.cpp
++++ b/SistemaTicoPack.cpp
+@@ -1,7 +1,9 @@
+ #include "SistemaTicoPack.h"
++#include "Validador.h"
+ 
+ SistemaTicoPack::SistemaTicoPack() {
+-    centros.insertarFinal(new CentroDistribucion("CD-001", "Centro principal"));
++    centros.insertarFinal(new CentroDistribucion("CD-001", "Centro principal",
++        "San Jose", "Calle 1, Avenida 2, San Jose", "2222-0000"));
+ }
+ 
+ SistemaTicoPack::SistemaTicoPack(const string& codigoCentro,
+@@ -27,6 +29,11 @@ CentroDistribucion* SistemaTicoPack::buscarCentro(const string& codigo) const {
+ 
+ bool SistemaTicoPack::agregarCentro(CentroDistribucion* nuevoCentro) {
+     if (nuevoCentro == nullptr ||
++        !Validador::textoValido(nuevoCentro->getCodigo()) ||
++        !Validador::textoValido(nuevoCentro->getNombre()) ||
++        !Validador::textoValido(nuevoCentro->getProvincia()) ||
++        !Validador::textoValido(nuevoCentro->getDireccion()) ||
++        !Validador::textoValido(nuevoCentro->getTelefono()) ||
+         buscarCentro(nuevoCentro->getCodigo()) != nullptr) return false;
+     centros.insertarFinal(nuevoCentro);
+     return true;
+@@ -42,6 +49,33 @@ const ListaEnlazada<CentroDistribucion>& SistemaTicoPack::getCentros() const {
+     return centros;
+ }
+ 
++Paquete* SistemaTicoPack::buscarPaqueteGlobal(const string& codigo) const {
++    for (Nodo<CentroDistribucion>* nodo = centros.getPrimero();
++        nodo != nullptr; nodo = nodo->getSiguiente()) {
++        Paquete* encontrado = nodo->getDato()->buscarPaquete(codigo);
++        if (encontrado != nullptr) return encontrado;
++    }
++    return nullptr;
++}
++
++SolicitudEnvio* SistemaTicoPack::buscarSolicitudGlobal(const string& codigo) const {
++    for (Nodo<CentroDistribucion>* nodo = centros.getPrimero();
++        nodo != nullptr; nodo = nodo->getSiguiente()) {
++        SolicitudEnvio* encontrada = nodo->getDato()->buscarSolicitud(codigo);
++        if (encontrada != nullptr) return encontrada;
++    }
++    return nullptr;
++}
++
++Despacho* SistemaTicoPack::buscarDespachoGlobal(const string& codigo) const {
++    for (Nodo<CentroDistribucion>* nodo = centros.getPrimero();
++        nodo != nullptr; nodo = nodo->getSiguiente()) {
++        Despacho* encontrado = nodo->getDato()->buscarDespacho(codigo);
++        if (encontrado != nullptr) return encontrado;
++    }
++    return nullptr;
++}
++
+ void SistemaTicoPack::mostrarEstado() const {
+     for (Nodo<CentroDistribucion>* nodo = centros.getPrimero();
+         nodo != nullptr; nodo = nodo->getSiguiente()) {
+diff --git a/SistemaTicoPack.h b/SistemaTicoPack.h
+index 71076ed..07ed3e4 100644
+--- a/SistemaTicoPack.h
++++ b/SistemaTicoPack.h
+@@ -21,6 +21,13 @@ public:
+     CentroDistribucion* buscarCentro(const string& codigo) const;
+     bool agregarCentro(CentroDistribucion* centro);
+     bool eliminarCentro(const string& codigo);
++
++    // Busquedas globales: los codigos de paquete, solicitud y despacho son
++    // unicos en todo el sistema, no solo dentro de un centro.
++    Paquete* buscarPaqueteGlobal(const string& codigo) const;
++    SolicitudEnvio* buscarSolicitudGlobal(const string& codigo) const;
++    Despacho* buscarDespachoGlobal(const string& codigo) const;
++
+     const ListaEnlazada<CentroDistribucion>& getCentros() const;
+     void mostrarEstado() const;
+ };
+diff --git a/SolicitudEnvio.cpp b/SolicitudEnvio.cpp
+index d035bd3..757eb6d 100644
+--- a/SolicitudEnvio.cpp
++++ b/SolicitudEnvio.cpp
+@@ -43,22 +43,38 @@ double SolicitudEnvio::getCosto() const { return costo; }
+ bool SolicitudEnvio::cambiarEstado(int nuevoEstado) {
+ 	if (!EstadoSolicitud::esValido(nuevoEstado) || esFinal()) return false;
+ 	if (nuevoEstado == EstadoSolicitud::PENDIENTE) return false;
++	// La aprobacion requiere las validaciones de CentroDistribucion.
++	if (nuevoEstado == EstadoSolicitud::APROBADA) return false;
+ 	estado = nuevoEstado;
+ 	return true;
+ }
+ 
++bool SolicitudEnvio::aprobar() {
++	if (estado != EstadoSolicitud::PENDIENTE) return false;
++	estado = EstadoSolicitud::APROBADA;
++	return true;
++}
++
+ bool SolicitudEnvio::esFinal() const {
+ 	return EstadoSolicitud::esFinal(estado);
+ }
+ 
+ void SolicitudEnvio::mostrar() const {
+ 	cout << "Solicitud: " << codigo << endl;
++	if (cliente != nullptr) {
++		cout << "Cliente: " << cliente->getNombre()
++			<< " (" << cliente->getIdentificacion() << ")" << endl;
++	}
++	if (paquete != nullptr) {
++		cout << "Paquete: " << paquete->getCodigo() << endl;
++	}
+ 	cout << "Origen: " << origen << endl;
+ 	cout << "Destino: " << destino << endl;
+-	cout << "Distancia: " << distancia << endl;
++	cout << "Fecha de solicitud: " << fechaSolicitud.toString()
++		<< " " << fechaSolicitud.horaToString() << endl;
+ 	cout << "Estado: " << EstadoSolicitud::toString(estado) << endl;
+ 	if (responsable != nullptr) {
+ 		cout << "Responsable: " << responsable->getNombreCompleto() << endl;
+ 	}
+-	cout << "Costo: " << costo << endl;
++	cout << "Costo estimado: " << costo << endl;
+ }
+diff --git a/SolicitudEnvio.h b/SolicitudEnvio.h
+index 6954e7e..59c80a7 100644
+--- a/SolicitudEnvio.h
++++ b/SolicitudEnvio.h
+@@ -22,6 +22,11 @@ private:
+ 	int estado;
+ 	double costo;
+ 
++	// La aprobacion solo puede ejecutarse desde la operacion del centro,
++	// que valida todas las reglas del negocio.
++	friend class CentroDistribucion;
++	bool aprobar();
++
+ public:
+ 	SolicitudEnvio(const string& codigo, Cliente* cliente, Paquete* paquete,
+ 		const string& origen, const string& destino, int distancia,
+diff --git a/Tarifas.cpp b/Tarifas.cpp
+index d27c6d0..afd591f 100644
+--- a/Tarifas.cpp
++++ b/Tarifas.cpp
+@@ -1,22 +1,19 @@
+ #include "Tarifas.h"
+ 
+-double Tarifas::costoBase(double peso, int distancia) {
+-	if (peso <= 0 || distancia < 0) return 0;
+-	// La guia define el costo base como peso por tarifa de categoria.
+-	// La distancia se conserva en la firma por compatibilidad con el modelo.
+-	return peso;
+-}
+-
+-double Tarifas::costoPorCategoria(double costo, int categoria) {
+-	if (costo < 0 || !Categoria::esValida(categoria)) return 0;
++const double Tarifas::TARIFA_GENERAL = 1500.0;
++const double Tarifas::TARIFA_FRAGIL = 2000.0;
++const double Tarifas::TARIFA_TECNOLOGIA = 2500.0;
++const double Tarifas::TARIFA_DOCUMENTOS = 1000.0;
+ 
+-	if (categoria == Categoria::GENERAL) return costo * 1500;
+-	if (categoria == Categoria::FRAGIL) return costo * 2000;
+-	if (categoria == Categoria::TECNOLOGIA) return costo * 2500;
+-	if (categoria == Categoria::DOCUMENTOS) return costo * 1000;
++double Tarifas::tarifaPorCategoria(int categoria) {
++	if (categoria == Categoria::GENERAL) return TARIFA_GENERAL;
++	if (categoria == Categoria::FRAGIL) return TARIFA_FRAGIL;
++	if (categoria == Categoria::TECNOLOGIA) return TARIFA_TECNOLOGIA;
++	if (categoria == Categoria::DOCUMENTOS) return TARIFA_DOCUMENTOS;
+ 	return 0;
+ }
+ 
+-double Tarifas::calcular(double peso, int categoria, int distancia) {
+-	return costoPorCategoria(costoBase(peso, distancia), categoria);
++double Tarifas::calcular(double peso, int categoria) {
++	if (peso <= 0 || !Categoria::esValida(categoria)) return 0;
++	return peso * tarifaPorCategoria(categoria);
+ }
+diff --git a/Tarifas.h b/Tarifas.h
+index 412311c..fc5def9 100644
+--- a/Tarifas.h
++++ b/Tarifas.h
+@@ -1,9 +1,19 @@
+ #pragma once
+ #include "Categoria.h"
+ 
++// Tarifas por kilogramo compartidas por toda la aplicacion. Se declaran
++// como atributos static para no repetir los montos dentro de cada calculo.
+ class Tarifas {
+ public:
+-	static double costoBase(double peso, int distancia);
+-	static double costoPorCategoria(double costo, int categoria);
+-	static double calcular(double peso, int categoria, int distancia);
++	static const double TARIFA_GENERAL;
++	static const double TARIFA_FRAGIL;
++	static const double TARIFA_TECNOLOGIA;
++	static const double TARIFA_DOCUMENTOS;
++
++	// Devuelve la tarifa por kilogramo de la categoria indicada.
++	// Si la categoria no es valida devuelve 0.
++	static double tarifaPorCategoria(int categoria);
++
++	// costo = peso * tarifa por kilogramo de la categoria.
++	static double calcular(double peso, int categoria);
+ };

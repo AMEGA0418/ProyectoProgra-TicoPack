@@ -1,5 +1,13 @@
 #include "Reportes.h"
 
+// Texto con 2 decimales, ej. 33.33%
+static string textoPorcentaje(double valor) {
+    long v = (long)(valor * 100 + 0.5);
+    long decimales = v % 100;
+    return to_string(v / 100) + "." + (decimales < 10 ? "0" : "") +
+        to_string(decimales) + "%";
+}
+
 void Reportes::resumenCentro(const CentroDistribucion& centro) {
     cout << "Reporte del centro de distribucion" << endl;
     cout << "Codigo: " << centro.getCodigo() << endl;
@@ -41,13 +49,26 @@ void Reportes::estadoPaquetes(const CentroDistribucion& centro) {
 }
 
 void Reportes::ocupacionBodegas(const CentroDistribucion& centro) {
-    cout << "Reporte de ocupacion de bodegas" << endl;
+    cout << "Reporte de ocupacion de bodegas del centro "
+        << centro.getCodigo() << " - " << centro.getNombre() << endl;
+
+    if (centro.getBodegas().estaVacia()) {
+        cout << "El centro no tiene bodegas registradas." << endl;
+        return;
+    }
+
     for (Nodo<Bodega>* nodo = centro.getBodegas().getPrimero();
         nodo != nullptr; nodo = nodo->getSiguiente()) {
         Bodega* bodega = nodo->getDato();
-        cout << bodega->getCodigo() << " - " << bodega->getNombre()
-            << ": " << bodega->porcentajeOcupacion() << "% ocupado, "
-            << bodega->celdasLibres() << " celdas libres" << endl;
+        cout << "Bodega " << bodega->getCodigo() << " - "
+            << bodega->getNombre() << " ("
+            << TipoBodega::toString(bodega->getTipo()) << ")" << endl;
+        cout << "  Total de celdas: " << bodega->totalCeldas() << endl;
+        cout << "  Celdas ocupadas: " << bodega->celdasOcupadas() << endl;
+        cout << "  Celdas disponibles: " << bodega->celdasLibres() << endl;
+        cout << "  Porcentaje de ocupacion: "
+            << textoPorcentaje(bodega->porcentajeOcupacion()) << endl;
+        cout << "-----------------------------------" << endl;
     }
 }
 
@@ -55,28 +76,50 @@ void Reportes::historialCliente(const CentroDistribucion& centro,
     Cliente* cliente) {
     if (cliente == nullptr) return;
 
-    cout << "Historial de " << cliente->getNombre() << endl;
+    cout << "Historial del cliente " << cliente->getNombre()
+        << " (" << cliente->getIdentificacion() << ")" << endl;
+    cout << "Centro: " << centro.getCodigo() << " - "
+        << centro.getNombre() << endl;
+
+    bool encontrado = false;
+
+    cout << "\nSolicitudes de envio:" << endl;
     for (Nodo<SolicitudEnvio>* nodo = centro.getSolicitudes().getPrimero();
         nodo != nullptr; nodo = nodo->getSiguiente()) {
         SolicitudEnvio* solicitud = nodo->getDato();
         if (solicitud->getCliente() == cliente) {
-            cout << "Solicitud " << solicitud->getCodigo()
-                << ", paquete " << solicitud->getPaquete()->getCodigo()
-                << ", fecha " << solicitud->getFechaSolicitud().toString()
-                << ", estado " << EstadoSolicitud::toString(solicitud->getEstado())
-                << endl;
+            encontrado = true;
+            cout << "  Codigo: " << solicitud->getCodigo()
+                << " | Paquete: "
+                << (solicitud->getPaquete() == nullptr ? "(sin paquete)" :
+                    solicitud->getPaquete()->getCodigo())
+                << " | Fecha: " << solicitud->getFechaSolicitud().toString()
+                << " " << solicitud->getFechaSolicitud().horaToString()
+                << " | Estado: "
+                << EstadoSolicitud::toString(solicitud->getEstado()) << endl;
         }
     }
+
+    cout << "\nDespachos:" << endl;
     for (Nodo<Despacho>* nodo = centro.getDespachos().getPrimero();
         nodo != nullptr; nodo = nodo->getSiguiente()) {
         Despacho* despacho = nodo->getDato();
-        if (despacho->getSolicitud() != nullptr &&
-            despacho->getSolicitud()->getCliente() == cliente) {
-            cout << "Despacho " << despacho->getCodigo()
-                << ", fecha " << despacho->getFechaCreacion().toString()
-                << ", estado " << EstadoDespacho::toString(despacho->getEstado())
-                << endl;
+        if (despacho->getCliente() == cliente) {
+            encontrado = true;
+            Paquete* paquete = despacho->getPaquete();
+            cout << "  Codigo: " << despacho->getCodigo()
+                << " | Paquete: "
+                << (paquete == nullptr ? "(sin paquete)" : paquete->getCodigo())
+                << " | Fecha: " << despacho->getFechaCreacion().toString()
+                << " " << despacho->getFechaCreacion().horaToString()
+                << " | Estado: "
+                << EstadoDespacho::toString(despacho->getEstado()) << endl;
         }
+    }
+
+    if (!encontrado) {
+        cout << "\nEl cliente no tiene solicitudes ni despachos registrados."
+            << endl;
     }
 }
 
@@ -87,53 +130,53 @@ void Reportes::clientesPorEnvios(const CentroDistribucion& centro) {
         return;
     }
 
-    // Reserva segura de memoria y inicialización explícita
-    Cliente** orden = new Cliente * [cantidad]();
+    Cliente** orden = new Cliente * [cantidad];
+    int* conteos = new int[cantidad];
     int indice = 0;
 
     for (Nodo<Cliente>* nodo = centro.getClientes().getPrimero();
         nodo != nullptr && indice < cantidad; nodo = nodo->getSiguiente()) {
-        orden[indice++] = nodo->getDato();
+        orden[indice] = nodo->getDato();
+        conteos[indice] = 0;
+        indice++;
     }
 
-    // Ordenamiento manual (Bubble Sort sin usar STL)
-    for (int i = 0; i < cantidad - 1; i++) {
-        for (int j = 0; j < cantidad - i - 1; j++) {
-            int actual = 0;
-            int siguiente = 0;
-            for (Nodo<Despacho>* d = centro.getDespachos().getPrimero();
-                d != nullptr; d = d->getSiguiente()) {
-                if (d->getDato()->getEstado() == EstadoDespacho::FINALIZADO &&
-                    d->getDato()->getSolicitud() != nullptr) {
-                    Cliente* cliente = d->getDato()->getSolicitud()->getCliente();
-                    if (cliente == orden[j]) actual++;
-                    if (cliente == orden[j + 1]) siguiente++;
-                }
-            }
-            if (actual < siguiente) {
-                Cliente* temporal = orden[j];
-                orden[j] = orden[j + 1];
-                orden[j + 1] = temporal;
+    // Contar despachos Finalizados por cliente.
+    for (Nodo<Despacho>* d = centro.getDespachos().getPrimero();
+        d != nullptr; d = d->getSiguiente()) {
+        if (d->getDato()->getEstado() != EstadoDespacho::FINALIZADO) continue;
+        Cliente* cliente = d->getDato()->getCliente();
+        for (int i = 0; i < cantidad; i++) {
+            if (orden[i] == cliente) {
+                conteos[i]++;
+                break;
             }
         }
     }
 
-    // Mostrar resultados
+    // Ordenamiento por insercion, de mayor a menor. Solo se mueve un elemento
+    // cuando su conteo es estrictamente mayor, por lo que los empates
+    // conservan el orden original de la lista de clientes.
+    for (int i = 1; i < cantidad; i++) {
+        Cliente* clienteActual = orden[i];
+        int conteoActual = conteos[i];
+        int j = i - 1;
+        while (j >= 0 && conteos[j] < conteoActual) {
+            orden[j + 1] = orden[j];
+            conteos[j + 1] = conteos[j];
+            j--;
+        }
+        orden[j + 1] = clienteActual;
+        conteos[j + 1] = conteoActual;
+    }
+
+    cout << "Clientes por cantidad de despachos finalizados" << endl;
     for (int i = 0; i < cantidad; i++) {
-        if (orden[i] == nullptr) continue;
-        int finalizados = 0;
-        for (Nodo<Despacho>* d = centro.getDespachos().getPrimero();
-            d != nullptr; d = d->getSiguiente()) {
-            if (d->getDato()->getEstado() == EstadoDespacho::FINALIZADO &&
-                d->getDato()->getSolicitud() != nullptr &&
-                d->getDato()->getSolicitud()->getCliente() == orden[i]) {
-                finalizados++;
-            }
-        }
-        cout << orden[i]->getNombre() << ": " << finalizados
-            << " despachos finalizados" << endl;
+        cout << orden[i]->getNombre() << " (" << orden[i]->getIdentificacion()
+            << "): " << conteos[i] << " despachos finalizados" << endl;
     }
 
+    delete[] conteos;
     delete[] orden;
 }
 
@@ -145,30 +188,70 @@ void Reportes::bitacoraPaquete(Paquete* paquete) {
 void Reportes::despachoDePaquete(const CentroDistribucion& centro,
     Paquete* paquete) {
     if (paquete == nullptr) return;
-    for (Nodo<Despacho>* nodo = centro.getDespachos().getPrimero();
+
+    cout << "Consulta de despacho del paquete " << paquete->getCodigo() << endl;
+
+    SolicitudEnvio* solicitudAprobada = nullptr;
+    for (Nodo<SolicitudEnvio>* nodo = centro.getSolicitudes().getPrimero();
         nodo != nullptr; nodo = nodo->getSiguiente()) {
-        if (nodo->getDato()->contienePaquete(paquete)) {
-            cout << "Despacho: " << nodo->getDato()->getCodigo() << endl;
-            cout << "Fecha: " << nodo->getDato()->getFechaCreacion().toString() << endl;
-            cout << "Estado: " << EstadoDespacho::toString(
-                nodo->getDato()->getEstado()) << endl;
-            return;
+        SolicitudEnvio* solicitud = nodo->getDato();
+        if (solicitud->getPaquete() == paquete &&
+            solicitud->getEstado() == EstadoSolicitud::APROBADA) {
+            solicitudAprobada = solicitud;
+            break;
         }
     }
-    cout << "El paquete no tiene despacho asociado." << endl;
+
+    if (solicitudAprobada != nullptr) {
+        cout << "Solicitud aprobada: " << solicitudAprobada->getCodigo()
+            << " | Fecha: "
+            << solicitudAprobada->getFechaSolicitud().toString()
+            << " | Estado: "
+            << EstadoSolicitud::toString(solicitudAprobada->getEstado())
+            << endl;
+    }
+    else {
+        cout << "El paquete no tiene una solicitud aprobada." << endl;
+    }
+
+    Despacho* despacho = centro.buscarDespachoDePaquete(paquete);
+    if (despacho == nullptr) {
+        cout << "El paquete no tiene despacho asociado." << endl;
+        return;
+    }
+
+    cout << "Despacho: " << despacho->getCodigo()
+        << " | Fecha: " << despacho->getFechaCreacion().toString()
+        << " " << despacho->getFechaCreacion().horaToString()
+        << " | Estado: " << EstadoDespacho::toString(despacho->getEstado())
+        << endl;
 }
 
 void Reportes::despachosPorColaborador(const CentroDistribucion& centro,
     Colaborador* colaborador) {
     if (colaborador == nullptr) return;
+
+    cout << "Despachos gestionados por " << colaborador->getNombreCompleto()
+        << " (" << colaborador->getIdentificacion() << ")" << endl;
+
+    bool encontrado = false;
     for (Nodo<Despacho>* nodo = centro.getDespachos().getPrimero();
         nodo != nullptr; nodo = nodo->getSiguiente()) {
         Despacho* despacho = nodo->getDato();
         if (despacho->getResponsable() == colaborador) {
-            cout << "Despacho: " << despacho->getCodigo()
-                << ", fecha " << despacho->getFechaCreacion().toString()
-                << ", estado " << EstadoDespacho::toString(despacho->getEstado())
-                << endl;
+            encontrado = true;
+            Paquete* paquete = despacho->getPaquete();
+            cout << "  Codigo: " << despacho->getCodigo()
+                << " | Paquete: "
+                << (paquete == nullptr ? "(sin paquete)" : paquete->getCodigo())
+                << " | Fecha: " << despacho->getFechaCreacion().toString()
+                << " " << despacho->getFechaCreacion().horaToString()
+                << " | Estado: "
+                << EstadoDespacho::toString(despacho->getEstado()) << endl;
         }
+    }
+
+    if (!encontrado) {
+        cout << "El colaborador no tiene despachos registrados." << endl;
     }
 }

@@ -14,6 +14,9 @@ class Despacho {
 private:
 	string codigo;
 	SolicitudEnvio* solicitud;
+	Cliente* cliente;
+	string centroOrigen;
+	string destino;
 	Colaborador* responsable;
 	Fecha fechaCreacion;
 	Fecha fechaFinalizacion;
@@ -35,8 +38,14 @@ public:
 	int getEstado() const;
 	const ListaEnlazada<Paquete>& getPaquetes() const;
 
+	// Datos derivados de la solicitud asociada (con verificacion de nulos).
+	Cliente* getCliente() const;
+	Paquete* getPaquete() const;
+	string getCentroOrigen() const;
+	string getDestino() const;
+
 	bool agregarPaquete(Paquete* paquete);
-	bool contienePaquete(Paquete* paquete) const;
+	bool contienePaquete(const Paquete* paquete) const;
 	bool finalizar(const Fecha& fecha);
 	void mostrar() const;
 };

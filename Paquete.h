@@ -19,6 +19,7 @@ private:
     int categoria;      // valor de Categoria (1 a 4)
     int estado;         // valor de EstadoPaquete
     Cliente* propietario;
+    string codigoCentro; // centro de distribucion al que pertenece
     string codigoBodega; // vacio si no tiene ubicacion
     int fila;            // -1 si no tiene ubicacion
     int columna;         // -1 si no tiene ubicacion
@@ -45,6 +46,11 @@ public:
     // Estado inicial RECIBIDO, sin bodega ni celda.
     Paquete(const string& codigo, const string& descripcion, double peso,
         int categoria, Cliente* propietario);
+
+    // Centro de distribucion al que pertenece el paquete. Lo asigna
+    // CentroDistribucion al registrarlo.
+    void asignarCentro(const string& nuevoCodigoCentro);
+    string getCodigoCentro() const;
 
     string getCodigo() const;
     string getDescripcion() const;
