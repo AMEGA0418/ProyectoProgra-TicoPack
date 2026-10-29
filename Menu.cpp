@@ -1,5 +1,9 @@
 #include "Menu.h"
 
+// Limite de seguridad para la interfaz: evita reservar matrices enormes.
+static const int MAX_FILAS_BODEGA = 100;
+static const int MAX_COLUMNAS_BODEGA = 100;
+
 // Quita espacios en blanco al inicio y al final de un texto.
 static string recortar(const string& texto) {
     size_t inicio = 0;
@@ -141,6 +145,7 @@ void Menu::mostrarOpciones() const {
     cout << " 6. Solicitudes de Envio\n";
     cout << " 7. Gestion de Despachos y Entregas\n";
     cout << " 8. Reportes del Sistema\n";
+    cout << " 9. Busquedas globales (paquete, solicitud, despacho)\n";
     cout << " 0. Salir del Sistema\n";
     cout << "==================================================\n";
 }
@@ -350,11 +355,17 @@ void Menu::menuBodegas() {
             }
             string nombre = leerTexto("Nombre de la bodega: ");
             int tipo = leerEntero("Tipo de bodega (1: General, 2: Fragil, 3: Tecnologia, 4: Documentos): ");
-            int filas = leerEntero("Cantidad de filas (>0): ");
-            int columnas = leerEntero("Cantidad de columnas (>0): ");
+            int filas = leerEntero("Cantidad de filas (1-100): ");
+            int columnas = leerEntero("Cantidad de columnas (1-100): ");
 
-            if (!TipoBodega::esValido(tipo) || !Bodega::esDistribucionValida(filas, columnas)) {
-                cout << "[Error] Tipo de bodega o dimensiones invalidas.\n";
+            bool dimensionesSeguras = filas <= MAX_FILAS_BODEGA &&
+                columnas <= MAX_COLUMNAS_BODEGA;
+            if (!TipoBodega::esValido(tipo) ||
+                !Bodega::esDistribucionValida(filas, columnas) ||
+                !dimensionesSeguras) {
+                cout << "[Error] Tipo de bodega o dimensiones invalidas "
+                    << "(filas y columnas entre 1 y " << MAX_FILAS_BODEGA
+                    << ").\n";
                 pausar();
                 continue;
             }
@@ -842,8 +853,6 @@ void Menu::menuDespachos() {
 }
 
 void Menu::menuReportes() {
-    CentroDistribucion* centro = seleccionarCentro();
-    if (centro == nullptr) return;
     limpiarPantalla();
     cout << "==================================================\n";
     cout << "          MODULO: REPORTES DEL SISTEMA            \n";
@@ -857,6 +866,20 @@ void Menu::menuReportes() {
     cout << "==================================================\n";
     int opcion = leerEntero("Seleccione el reporte deseado [1-6]: ");
 
+    // Los reportes 3 y 4 buscan el paquete por su codigo unico global, por lo
+    // que no necesitan que el usuario seleccione un centro. Los demas si.
+    if (opcion < 1 || opcion > 6) {
+        cout << "[Error] Opcion de reporte no valida.\n";
+        pausar();
+        return;
+    }
+
+    CentroDistribucion* centro = nullptr;
+    if (opcion != 3 && opcion != 4) {
+        centro = seleccionarCentro();
+        if (centro == nullptr) return;
+    }
+
     if (opcion == 1) {
         Cliente* cli = centro->buscarCliente(leerTexto("Identificacion del cliente: "));
         if (cli != nullptr) Reportes::historialCliente(*centro, cli);
@@ -866,14 +889,25 @@ void Menu::menuReportes() {
         Reportes::clientesPorEnvios(*centro);
     }
     else if (opcion == 3) {
-        Paquete* p = centro->buscarPaquete(leerTexto("Codigo de paquete: "));
+        Paquete* p = sistema->buscarPaqueteGlobal(leerTexto("Codigo unico de paquete: "));
         if (p != nullptr) Reportes::bitacoraPaquete(p);
-        else cout << "[Error] Paquete no encontrado.\n";
+        else cout << "[Error] Paquete no encontrado en el sistema.\n";
     }
     else if (opcion == 4) {
-        Paquete* p = centro->buscarPaquete(leerTexto("Codigo de paquete: "));
-        if (p != nullptr) Reportes::despachoDePaquete(*centro, p);
-        else cout << "[Error] Paquete no encontrado.\n";
+        Paquete* p = sistema->buscarPaqueteGlobal(leerTexto("Codigo unico de paquete: "));
+        if (p == nullptr) {
+            cout << "[Error] Paquete no encontrado en el sistema.\n";
+        }
+        else {
+            CentroDistribucion* centroPaquete =
+                sistema->buscarCentro(p->getCodigoCentro());
+            if (centroPaquete != nullptr) {
+                Reportes::despachoDePaquete(*centroPaquete, p);
+            }
+            else {
+                cout << "[Error] No se encontro el centro del paquete.\n";
+            }
+        }
     }
     else if (opcion == 5) {
         Reportes::ocupacionBodegas(*centro);
@@ -882,10 +916,78 @@ void Menu::menuReportes() {
         Colaborador* col = seleccionarColaborador(centro);
         if (col != nullptr) Reportes::despachosPorColaborador(*centro, col);
     }
-    else {
-        cout << "[Error] Opcion de reporte no valida.\n";
-    }
     pausar();
+}
+
+void Menu::menuBusquedasGlobales() {
+    int opcion;
+    do {
+        limpiarPantalla();
+        cout << "==================================================\n";
+        cout << "       BUSQUEDAS GLOBALES POR CODIGO UNICO        \n";
+        cout << "==================================================\n";
+        cout << " 1. Buscar paquete\n";
+        cout << " 2. Buscar solicitud de envio\n";
+        cout << " 3. Buscar despacho\n";
+        cout << " 0. Regresar\n";
+        cout << "==================================================\n";
+        opcion = leerEntero("Seleccione una opcion: ");
+
+        if (opcion == 1) {
+            Paquete* p = sistema->buscarPaqueteGlobal(
+                leerTexto("Codigo unico del paquete: "));
+            if (p == nullptr) {
+                cout << "[Aviso] Paquete no encontrado en el sistema.\n";
+            }
+            else {
+                CentroDistribucion* c =
+                    sistema->buscarCentro(p->getCodigoCentro());
+                if (c != nullptr) {
+                    cout << "Centro: " << c->getNombre() << " ("
+                        << c->getCodigo() << ")\n";
+                }
+                p->mostrar();
+            }
+            pausar();
+        }
+        else if (opcion == 2) {
+            SolicitudEnvio* s = sistema->buscarSolicitudGlobal(
+                leerTexto("Codigo unico de la solicitud: "));
+            if (s == nullptr) {
+                cout << "[Aviso] Solicitud no encontrada en el sistema.\n";
+            }
+            else {
+                CentroDistribucion* c = sistema->buscarCentro(s->getOrigen());
+                if (c != nullptr) {
+                    cout << "Centro: " << c->getNombre() << " ("
+                        << c->getCodigo() << ")\n";
+                }
+                s->mostrar();
+            }
+            pausar();
+        }
+        else if (opcion == 3) {
+            Despacho* d = sistema->buscarDespachoGlobal(
+                leerTexto("Codigo unico del despacho: "));
+            if (d == nullptr) {
+                cout << "[Aviso] Despacho no encontrado en el sistema.\n";
+            }
+            else {
+                CentroDistribucion* c =
+                    sistema->buscarCentro(d->getCentroOrigen());
+                if (c != nullptr) {
+                    cout << "Centro: " << c->getNombre() << " ("
+                        << c->getCodigo() << ")\n";
+                }
+                d->mostrar();
+            }
+            pausar();
+        }
+        else if (opcion != 0) {
+            cout << "[Error] Opcion invalida.\n";
+            pausar();
+        }
+    } while (opcion != 0);
 }
 
 void Menu::ejecutar() {
@@ -906,6 +1008,7 @@ void Menu::ejecutar() {
         case 6: menuSolicitudes(); break;
         case 7: menuDespachos(); break;
         case 8: menuReportes(); break;
+        case 9: menuBusquedasGlobales(); break;
         case 0: cout << "\nSaliendo del sistema TicoPack Logistics. ¡Hasta pronto!\n"; break;
         default:
             cout << "[Error] Opcion invalida. Intente de nuevo.\n";

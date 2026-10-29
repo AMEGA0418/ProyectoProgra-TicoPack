@@ -1,7 +1,27 @@
-﻿  CentroDistribucion.cpp
+﻿  Bodega.cpp
+  Categoria.cpp
+  Celda.cpp
+  CentroDistribucion.cpp
+  Cliente.cpp
+  Colaborador.cpp
+  Despacho.cpp
+  Empresa.cpp
+  EstadoDespacho.cpp
+  EstadoPaquete.cpp
+  EstadoSolicitud.cpp
+  Fecha.cpp
   Menu.cpp
+  main.cpp
+  Paquete.cpp
+  PersonaFisica.cpp
+  RegistroBitacora.cpp
   Reportes.cpp
   SistemaTicoPack.cpp
-  main.cpp
+  SolicitudEnvio.cpp
+  Generando código...
+  Compilando...
+  Tarifas.cpp
+  TipoBodega.cpp
+  Validador.cpp
   Generando código...
   TicoPack.vcxproj -> C:\Users\amega\OneDrive\Documentos\GitHub\ProyectoProgra-ZonaActiva\ProyectoProgra-TicoPack\x64\Debug\TicoPack.exe
