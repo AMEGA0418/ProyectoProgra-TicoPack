@@ -94,7 +94,20 @@
             "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\ucrt\\ctype.h",
             "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\listaenlazada.h",
             "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\nodo.h",
-            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\fecha.h"
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\fecha.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\bodega.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\celda.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\tipobodega.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\categoria.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\cliente.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\colaborador.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\paquete.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\estadopaquete.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\registrobitacora.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\solicitudenvio.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\estadosolicitud.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\despacho.h",
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\estadodespacho.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

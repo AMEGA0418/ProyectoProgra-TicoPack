@@ -1,6 +1,9 @@
 #pragma once
+#include "SistemaTicoPack.h"
+#include "Reportes.h"
+#include <iostream>
 
-class SistemaTicoPack;
+using namespace std;
 
 class Menu {
 private:

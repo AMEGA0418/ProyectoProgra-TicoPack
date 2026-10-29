@@ -1,9 +1,4 @@
 #include "SolicitudEnvio.h"
-#include "Cliente.h"
-#include "Paquete.h"
-#include <iostream>
-
-using namespace std;
 
 SolicitudEnvio::SolicitudEnvio(const string& codigo, Cliente* cliente,Paquete* paquete, const string& origen, 
 const string& destino,int distancia, const Fecha& fechaSolicitud, double costo): fechaSolicitud(fechaSolicitud){

@@ -1,7 +1,4 @@
 #include "SistemaTicoPack.h"
-#include <iostream>
-
-using namespace std;
 
 SistemaTicoPack::SistemaTicoPack() {
     centro = new CentroDistribucion("CD-001", "Centro principal");

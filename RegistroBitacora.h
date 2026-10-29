@@ -1,8 +1,11 @@
 #pragma once
+
+#include <iostream>
 #include "Fecha.h"
 #include "EstadoPaquete.h"
+#include "Colaborador.h"
 
-class Colaborador;
+using namespace std;
 
 // Un cambio de estado de un paquete. Una vez creado no se modifica ni se elimina.
 class RegistroBitacora {

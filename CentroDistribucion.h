@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include "ListaEnlazada.h"
 #include "Fecha.h"
 #include "Bodega.h"
@@ -8,6 +9,7 @@
 #include "Paquete.h"
 #include "SolicitudEnvio.h"
 #include "Despacho.h"
+
 
 using namespace std;
 

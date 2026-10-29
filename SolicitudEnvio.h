@@ -1,12 +1,12 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include "Fecha.h"
 #include "EstadoSolicitud.h"
+#include "Cliente.h"
+#include "Paquete.h"
 
 using namespace std;
-
-class Cliente;
-class Paquete;
 
 class SolicitudEnvio {
 private:

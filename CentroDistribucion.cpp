@@ -1,7 +1,5 @@
 #include "CentroDistribucion.h"
-#include <iostream>
-
-using namespace std;
+#include "Celda.h"
 
 CentroDistribucion::CentroDistribucion(const string& codigo,
 	const string& nombre) {

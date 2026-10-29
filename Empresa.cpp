@@ -1,7 +1,4 @@
 #include "Empresa.h"
-#include <iostream>
-
-using namespace std;
 
 bool Empresa::esPorcentajeValido(double porcentaje) {
     return porcentaje >= 0 && porcentaje <= 100;

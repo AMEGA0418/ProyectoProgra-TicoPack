@@ -1,8 +1,4 @@
 #include "Despacho.h"
-#include "Colaborador.h"
-#include <iostream>
-
-using namespace std;
 
 Despacho::Despacho(const string& codigo, Colaborador* responsable,
 	const Fecha& fechaCreacion) : fechaCreacion(fechaCreacion),

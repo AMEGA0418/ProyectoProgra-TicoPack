@@ -1,11 +1,13 @@
 #pragma once
 #include <string>
-#include "Celda.h"
+#include <iostream>
 #include "TipoBodega.h"
 #include "Categoria.h"
-using namespace std;
 
+class Celda;
 class Paquete;
+
+using namespace std;
 
 class Bodega {
 private:

@@ -1,8 +1,4 @@
 #include "Reportes.h"
-#include "EstadoPaquete.h"
-#include <iostream>
-
-using namespace std;
 
 void Reportes::resumenCentro(const CentroDistribucion& centro) {
     cout << "Reporte del centro de distribucion" << endl;

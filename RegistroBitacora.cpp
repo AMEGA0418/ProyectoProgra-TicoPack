@@ -1,8 +1,4 @@
 #include "RegistroBitacora.h"
-#include "Colaborador.h"
-#include <iostream>
-
-using namespace std;
 
 RegistroBitacora::RegistroBitacora(int estadoAnterior,
     int nuevoEstado,

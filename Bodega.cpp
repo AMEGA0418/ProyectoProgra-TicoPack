@@ -1,8 +1,6 @@
 #include "Bodega.h"
+#include "Celda.h"
 #include "Paquete.h"
-#include <iostream>
-
-using namespace std;
 
 // Texto con 2 decimales, ej. 33.33%
 static string textoPorcentaje(double valor) {

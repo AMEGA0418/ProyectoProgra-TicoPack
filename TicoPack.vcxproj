@@ -58,6 +58,7 @@
     <ClCompile Include="EstadoSolicitud.cpp" />
     <ClCompile Include="Fecha.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Paquete.cpp" />
     <ClCompile Include="PersonaFisica.cpp" />
     <ClCompile Include="RegistroBitacora.cpp" />
@@ -184,3 +185,4 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
+

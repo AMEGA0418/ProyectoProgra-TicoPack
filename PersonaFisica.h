@@ -1,5 +1,8 @@
 #pragma once
+#include <iostream>
 #include "Cliente.h"
+
+using namespace std;
 
 class PersonaFisica : public Cliente {
 public:

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include "Fecha.h"
 
 using namespace std;

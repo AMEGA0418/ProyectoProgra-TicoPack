@@ -1,13 +1,13 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include "Fecha.h"
 #include "EstadoDespacho.h"
 #include "ListaEnlazada.h"
 #include "Paquete.h"
+#include "Colaborador.h"
 
 using namespace std;
-
-class Colaborador;
 
 class Despacho {
 private:

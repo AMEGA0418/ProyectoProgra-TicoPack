@@ -1,17 +1,18 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include "Fecha.h"
 #include "Categoria.h"
 #include "EstadoPaquete.h"
 #include "ListaEnlazada.h"
 #include "RegistroBitacora.h"
+#include "Cliente.h"
+#include "Colaborador.h"
 
 using namespace std;
 
-class Cliente;
-class Colaborador;
-class Bodega;
 class CentroDistribucion;
+class Bodega;
 
 class Paquete {
 private:

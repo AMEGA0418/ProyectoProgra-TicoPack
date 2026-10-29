@@ -1,7 +1,5 @@
 #include "Validador.h"
 
-using namespace std;
-
 bool Validador::textoValido(const string& texto) {
     for (size_t i = 0; i < texto.size(); i++) {
         char caracter = texto[i];

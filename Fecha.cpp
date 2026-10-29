@@ -1,7 +1,4 @@
 #include "Fecha.h"
-#include <iostream>
-
-using namespace std;
 
 // Convierte n a texto con al menos 'ancho' digitos (relleno con ceros).
 static string conCeros(int n, int ancho) {

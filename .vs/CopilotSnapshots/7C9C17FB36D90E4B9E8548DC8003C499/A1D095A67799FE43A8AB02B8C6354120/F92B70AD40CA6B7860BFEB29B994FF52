@@ -1,0 +1,237 @@
+﻿#include "Bodega.h"
+
+// Texto con 2 decimales, ej. 33.33%
+static string textoPorcentaje(double valor) {
+    long v = (long)(valor * 100 + 0.5);
+    long decimales = v % 100;
+    return to_string(v / 100) + "." + (decimales < 10 ? "0" : "") +
+        to_string(decimales) + "%";
+}
+
+static string centrar(const string& s, size_t ancho) {
+    if (s.size() >= ancho) return s;
+    size_t total = ancho - s.size();
+    size_t izquierda = total / 2;
+    return string(izquierda, ' ') + s + string(total - izquierda, ' ');
+}
+
+bool Bodega::esDistribucionValida(int filas, int columnas) {
+    return filas > 0 && columnas > 0;
+}
+
+Bodega::Bodega(const string& codigo, const string& nombre, int tipo,
+    int filas, int columnas) {
+    this->codigo = codigo;
+    this->nombre = nombre;
+    this->tipo = tipo;
+    this->filas = filas;
+    this->columnas = columnas;
+    matriz = nullptr;
+
+    reservarMatriz();
+}
+
+Bodega::~Bodega() {
+    liberarMatriz();
+}
+
+void Bodega::reservarMatriz() {
+    if (matriz != nullptr) return;
+
+    if (!esDistribucionValida(filas, columnas)) {
+        filas = 0;
+        columnas = 0;
+        return;
+    }
+
+    bool compacto = (filas <= 10 && columnas <= 10);
+
+    matriz = new Celda * *[filas];
+    for (int i = 0; i < filas; i++) {
+        matriz[i] = new Celda * [columnas];
+        for (int j = 0; j < columnas; j++) {
+            matriz[i][j] = new Celda(codigo, i, j, compacto);
+        }
+    }
+}
+
+void Bodega::liberarMatriz() {
+    if (matriz == nullptr) return;
+
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            delete matriz[i][j];
+        }
+        delete[] matriz[i];
+    }
+    delete[] matriz;
+    matriz = nullptr;
+}
+
+string Bodega::getCodigo() const { return codigo; }
+string Bodega::getNombre() const { return nombre; }
+int Bodega::getTipo() const { return tipo; }
+int Bodega::getFilas() const { return filas; }
+int Bodega::getColumnas() const { return columnas; }
+
+bool Bodega::posicionValida(int fila, int columna) const {
+    return matriz != nullptr &&
+        fila >= 0 && fila < filas &&
+        columna >= 0 && columna < columnas;
+}
+
+Celda* Bodega::consultarCelda(int fila, int columna) const {
+    if (!posicionValida(fila, columna)) return nullptr;
+    return matriz[fila][columna];
+}
+
+bool Bodega::asignarPaquete(int fila, int columna, Paquete* paquete) {
+    if (paquete == nullptr || !posicionValida(fila, columna)) return false;
+
+    Celda* celda = matriz[fila][columna];
+    if (!celda->estaLibre()) return false;
+
+    celda->ocupar(paquete);
+    return true;
+}
+
+bool Bodega::liberarCelda(int fila, int columna) {
+    if (!posicionValida(fila, columna)) return false;
+
+    Celda* celda = matriz[fila][columna];
+    if (celda->estaLibre()) return false;
+
+    celda->liberar();
+    return true;
+}
+
+Celda* Bodega::primeraCeldaLibre() const {
+    if (matriz == nullptr) return nullptr;
+
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            if (matriz[i][j]->estaLibre()) {
+                return matriz[i][j];
+            }
+        }
+    }
+    return nullptr;
+}
+
+bool Bodega::esCompatible(int categoria) const {
+    return TipoBodega::esCompatible(tipo, categoria);
+}
+
+int Bodega::totalCeldas() const {
+    if (matriz == nullptr) return 0;
+    return filas * columnas;
+}
+
+int Bodega::celdasOcupadas() const {
+    if (matriz == nullptr) return 0;
+
+    int ocupadas = 0;
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            if (!matriz[i][j]->estaLibre()) {
+                ocupadas++;
+            }
+        }
+    }
+    return ocupadas;
+}
+
+int Bodega::celdasLibres() const {
+    return totalCeldas() - celdasOcupadas();
+}
+
+double Bodega::porcentajeOcupacion() const {
+    int total = totalCeldas();
+    if (total == 0) return 0;
+    return (double)celdasOcupadas() / total * 100;
+}
+
+double Bodega::porcentajeDisponible() const {
+    int total = totalCeldas();
+    if (total == 0) return 0;
+    return (double)celdasLibres() / total * 100;
+}
+
+void Bodega::mostrarDatos() const {
+    cout << "Codigo: " << codigo << endl;
+    cout << "Nombre: " << nombre << endl;
+    cout << "Tipo: " << TipoBodega::toString(tipo) << endl;
+    cout << "Distribucion: " << filas << " filas x " << columnas
+        << " columnas" << endl;
+    cout << "Celdas totales: " << totalCeldas() << endl;
+    cout << "Celdas ocupadas: " << celdasOcupadas() << endl;
+    cout << "Celdas libres: " << celdasLibres() << endl;
+    cout << "Ocupacion: " << textoPorcentaje(porcentajeOcupacion()) << endl;
+}
+
+void Bodega::mostrarMatriz(bool usarColor) const {
+    cout << "Bodega " << codigo << " - " << nombre << " ("
+        << TipoBodega::toString(tipo) << "), " << filas << " filas x "
+        << columnas << " columnas" << endl;
+
+    if (matriz == nullptr) {
+        cout << "(la bodega no tiene matriz reservada)" << endl;
+        return;
+    }
+
+    // Ancho de columna segun el texto mas largo (identificador o codigo de paquete)
+    size_t ancho = 5;   // "LIBRE"
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            Celda* celda = matriz[i][j];
+            size_t t = celda->getIdentificador().size();
+            if (t > ancho) ancho = t;
+            if (!celda->estaLibre()) {
+                t = celda->getPaquete()->getCodigo().size();
+                if (t > ancho) ancho = t;
+            }
+        }
+    }
+    ancho += 2;
+
+    string borde = "+";
+    for (int j = 0; j < columnas; j++) {
+        borde += string(ancho, '-') + "+";
+    }
+
+    const string VERDE = "\033[42;30m";
+    const string ROJO = "\033[41;97m";
+    const string RESET = "\033[0m";
+
+    for (int i = 0; i < filas; i++) {
+        cout << borde << endl;
+
+        for (int linea = 0; linea < 2; linea++) {
+            for (int j = 0; j < columnas; j++) {
+                Celda* celda = matriz[i][j];
+                string texto;
+
+                if (linea == 0) {
+                    texto = celda->getIdentificador();
+                }
+                else if (celda->estaLibre()) {
+                    texto = "LIBRE";
+                }
+                else {
+                    texto = celda->getPaquete()->getCodigo();
+                }
+
+                cout << "|";
+                if (usarColor) {
+                    cout << (celda->estaLibre() ? VERDE : ROJO)
+                        << centrar(texto, ancho) << RESET;
+                }
+                else {
+                    cout << centrar(texto, ancho);
+                }
+            }
+            cout << "|" << endl;
+        }
+    }
+    cout << borde << endl;
+}

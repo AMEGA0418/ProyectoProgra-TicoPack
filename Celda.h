@@ -5,8 +5,6 @@ using namespace std;
 
 class Paquete;
 
-// Una posicion de la matriz de una bodega. Esta libre o guarda un paquete.
-// La celda NO es duena del paquete (solo lo referencia).
 class Celda {
 private:
     string codigoBodega;

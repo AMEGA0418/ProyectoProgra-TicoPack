@@ -1,7 +1,4 @@
 #include "Colaborador.h"
-#include <iostream>
-
-using namespace std;
 
 Colaborador::Colaborador(const string& identificacion,
     const string& nombreCompleto,

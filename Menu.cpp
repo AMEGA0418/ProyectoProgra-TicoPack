@@ -1,9 +1,4 @@
 #include "Menu.h"
-#include "SistemaTicoPack.h"
-#include "Reportes.h"
-#include <iostream>
-
-using namespace std;
 
 Menu::Menu(SistemaTicoPack* sistema) {
     this->sistema = sistema;

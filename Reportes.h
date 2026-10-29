@@ -1,5 +1,9 @@
 #pragma once
+#include <iostream>
 #include "CentroDistribucion.h"
+#include "EstadoPaquete.h"
+
+using namespace std;
 
 class Reportes {
 public:

@@ -1,7 +1,4 @@
 #include "Cliente.h"
-#include <iostream>
-
-using namespace std;
 
 Cliente::Cliente(const string& identificacion, const string& nombre,
     const string& telefono, const string& correo) {

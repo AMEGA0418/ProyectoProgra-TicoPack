@@ -1,10 +1,6 @@
 #include "Paquete.h"
 #include "Bodega.h"
-#include "Cliente.h"
-#include "Colaborador.h"
-#include <iostream>
-
-using namespace std;
+#include "Celda.h"
 
 // true si el caracter es un espacio en blanco (espacio, tab, salto de linea, etc.)
 static bool esEspacio(char c) {

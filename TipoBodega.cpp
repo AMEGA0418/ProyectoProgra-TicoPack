@@ -1,5 +1,4 @@
 #include "TipoBodega.h"
-#include "Categoria.h"
 
 const int TipoBodega::GENERAL = 1;
 const int TipoBodega::FRAGIL = 2;

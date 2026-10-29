@@ -1,5 +1,8 @@
 #pragma once
+#include <iostream>
 #include "CentroDistribucion.h"
+
+using namespace std;
 
 class SistemaTicoPack {
 private:
