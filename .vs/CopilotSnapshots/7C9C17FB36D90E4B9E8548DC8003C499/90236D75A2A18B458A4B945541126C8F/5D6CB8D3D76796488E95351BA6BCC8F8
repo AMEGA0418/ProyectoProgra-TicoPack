@@ -1,0 +1,44 @@
+﻿#include "SolicitudEnvio.h"
+
+SolicitudEnvio::SolicitudEnvio(const string& codigo, Cliente* cliente,Paquete* paquete, const string& origen, 
+const string& destino,int distancia, const Fecha& fechaSolicitud, double costo): fechaSolicitud(fechaSolicitud){
+
+	this->codigo = codigo;
+	this->cliente = cliente;
+	this->paquete = paquete;
+	this->origen = origen;
+	this->destino = destino;
+	this->distancia = distancia;
+	this->estado = EstadoSolicitud::PENDIENTE;
+	this->costo = costo;
+}
+
+string SolicitudEnvio::getCodigo() const { return codigo; }
+Cliente* SolicitudEnvio::getCliente() const { return cliente; }
+Paquete* SolicitudEnvio::getPaquete() const { return paquete; }
+string SolicitudEnvio::getOrigen() const { return origen; }
+string SolicitudEnvio::getDestino() const { return destino; }
+int SolicitudEnvio::getDistancia() const { return distancia; }
+Fecha SolicitudEnvio::getFechaSolicitud() const { return fechaSolicitud; }
+int SolicitudEnvio::getEstado() const { return estado; }
+double SolicitudEnvio::getCosto() const { return costo; }
+
+bool SolicitudEnvio::cambiarEstado(int nuevoEstado) {
+	if (!EstadoSolicitud::esValido(nuevoEstado) || esFinal()) return false;
+	if (nuevoEstado == EstadoSolicitud::PENDIENTE) return false;
+	estado = nuevoEstado;
+	return true;
+}
+
+bool SolicitudEnvio::esFinal() const {
+	return EstadoSolicitud::esFinal(estado);
+}
+
+void SolicitudEnvio::mostrar() const {
+	cout << "Solicitud: " << codigo << endl;
+	cout << "Origen: " << origen << endl;
+	cout << "Destino: " << destino << endl;
+	cout << "Distancia: " << distancia << endl;
+	cout << "Estado: " << EstadoSolicitud::toString(estado) << endl;
+	cout << "Costo: " << costo << endl;
+}

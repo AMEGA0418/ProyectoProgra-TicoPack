@@ -17,6 +17,9 @@ class CentroDistribucion {
 private:
 	string codigo;
 	string nombre;
+	string provincia;
+	string direccion;
+	string telefono;
 	ListaEnlazada<Bodega> bodegas;
 	ListaEnlazada<Cliente> clientes;
 	ListaEnlazada<Colaborador> colaboradores;
@@ -26,9 +29,15 @@ private:
 
 public:
 	CentroDistribucion(const string& codigo, const string& nombre);
+	CentroDistribucion(const string& codigo, const string& nombre,
+		const string& provincia, const string& direccion,
+		const string& telefono);
 
 	string getCodigo() const;
 	string getNombre() const;
+	string getProvincia() const;
+	string getDireccion() const;
+	string getTelefono() const;
 
 	bool agregarBodega(Bodega* bodega);
 	bool agregarCliente(Cliente* cliente);
@@ -36,9 +45,14 @@ public:
 	bool agregarPaquete(Paquete* paquete);
 	bool agregarSolicitud(SolicitudEnvio* solicitud);
 	bool agregarDespacho(Despacho* despacho);
+	bool eliminarBodega(const string& codigo);
+	bool eliminarCliente(const string& identificacion);
+	bool eliminarColaborador(const string& identificacion);
+	bool eliminarPaquete(const string& codigo);
 
 	Bodega* buscarBodega(const string& codigo) const;
 	Cliente* buscarCliente(const string& identificacion) const;
+	Colaborador* buscarColaborador(const string& identificacion) const;
 	Paquete* buscarPaquete(const string& codigo) const;
 	SolicitudEnvio* buscarSolicitud(const string& codigo) const;
 	Despacho* buscarDespacho(const string& codigo) const;
@@ -52,8 +66,13 @@ public:
 
 	bool almacenarPaquete(Paquete* paquete, Bodega* bodega,
 		Colaborador* responsable, const Fecha& fecha);
+	bool reubicarPaquete(Paquete* paquete, Bodega* destino,
+		int fila, int columna);
 	bool aprobarSolicitud(SolicitudEnvio* solicitud);
+	bool aprobarSolicitud(SolicitudEnvio* solicitud,
+		Colaborador* responsable, const Fecha& fecha);
 	bool finalizarDespacho(Despacho* despacho, const Fecha& fecha,
 		Colaborador* responsable);
+	bool tieneDependencias() const;
 	void mostrar() const;
 };

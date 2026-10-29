@@ -6,6 +6,22 @@ const string& destino,int distancia, const Fecha& fechaSolicitud, double costo):
 	this->codigo = codigo;
 	this->cliente = cliente;
 	this->paquete = paquete;
+	this->responsable = nullptr;
+	this->origen = origen;
+	this->destino = destino;
+	this->distancia = distancia;
+	this->estado = EstadoSolicitud::PENDIENTE;
+	this->costo = costo;
+}
+
+SolicitudEnvio::SolicitudEnvio(const string& codigo, Cliente* cliente,
+	Paquete* paquete, Colaborador* responsable, const string& origen,
+	const string& destino, int distancia, const Fecha& fechaSolicitud,
+	double costo) : fechaSolicitud(fechaSolicitud) {
+	this->codigo = codigo;
+	this->cliente = cliente;
+	this->paquete = paquete;
+	this->responsable = responsable;
 	this->origen = origen;
 	this->destino = destino;
 	this->distancia = distancia;
@@ -16,6 +32,7 @@ const string& destino,int distancia, const Fecha& fechaSolicitud, double costo):
 string SolicitudEnvio::getCodigo() const { return codigo; }
 Cliente* SolicitudEnvio::getCliente() const { return cliente; }
 Paquete* SolicitudEnvio::getPaquete() const { return paquete; }
+Colaborador* SolicitudEnvio::getResponsable() const { return responsable; }
 string SolicitudEnvio::getOrigen() const { return origen; }
 string SolicitudEnvio::getDestino() const { return destino; }
 int SolicitudEnvio::getDistancia() const { return distancia; }
@@ -40,5 +57,8 @@ void SolicitudEnvio::mostrar() const {
 	cout << "Destino: " << destino << endl;
 	cout << "Distancia: " << distancia << endl;
 	cout << "Estado: " << EstadoSolicitud::toString(estado) << endl;
+	if (responsable != nullptr) {
+		cout << "Responsable: " << responsable->getNombreCompleto() << endl;
+	}
 	cout << "Costo: " << costo << endl;
 }

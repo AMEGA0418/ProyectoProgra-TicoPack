@@ -1,9 +1,8 @@
 #pragma once
 #include <string>
+#include "Paquete.h"
 
 using namespace std;
-
-class Paquete;
 
 class Celda {
 private:

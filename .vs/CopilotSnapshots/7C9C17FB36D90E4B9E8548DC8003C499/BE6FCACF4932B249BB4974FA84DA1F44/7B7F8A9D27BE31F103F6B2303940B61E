@@ -1,0 +1,337 @@
+﻿#include "Menu.h"
+
+Menu::Menu(SistemaTicoPack* sistema) {
+    this->sistema = sistema;
+}
+
+void Menu::limpiarPantalla() const {
+    // Secuencia ANSI: no requiere agregar bibliotecas al proyecto.
+    cout << "\033[2J\033[H";
+}
+
+void Menu::confirmarAccion(const string& mensaje) const {
+    cout << mensaje << endl;
+    pausar();
+}
+
+string Menu::leerTexto(const string& mensaje) const {
+    string texto;
+    do {
+        cout << mensaje;
+        cin >> ws;
+        getline(cin, texto);
+        if (!Validador::textoValido(texto)) cout << "El valor no puede estar vacio." << endl;
+    } while (!Validador::textoValido(texto));
+    return texto;
+}
+
+int Menu::leerEntero(const string& mensaje) const {
+    int valor;
+    while (true) {
+        cout << mensaje;
+        cin >> valor;
+        if (!cin.fail()) {
+            cin.ignore(10000, '\n');
+            return valor;
+        }
+        cin.clear();
+        cin.ignore(10000, '\n');
+        cout << "Debe ingresar un numero entero." << endl;
+    }
+}
+
+double Menu::leerDecimal(const string& mensaje) const {
+    double valor;
+    while (true) {
+        cout << mensaje;
+        cin >> valor;
+        if (!cin.fail()) {
+            cin.ignore(10000, '\n');
+            return valor;
+        }
+        cin.clear();
+        cin.ignore(10000, '\n');
+        cout << "Debe ingresar un numero valido." << endl;
+    }
+}
+
+Fecha Menu::leerFecha(const string& mensaje) const {
+    while (true) {
+        cout << mensaje << endl;
+        int dia = leerEntero("Dia: ");
+        int mes = leerEntero("Mes: ");
+        int anio = leerEntero("Anio: ");
+        int hora = leerEntero("Hora (0-23): ");
+        int minuto = leerEntero("Minuto (0-59): ");
+        Fecha fecha(dia, mes, anio, hora, minuto);
+        if (fecha.esValida()) return fecha;
+        cout << "La fecha no es valida." << endl;
+    }
+}
+
+CentroDistribucion* Menu::seleccionarCentro() const {
+    if (sistema == nullptr || sistema->getCentros().estaVacia()) return nullptr;
+    string codigo = leerTexto("Codigo del centro: ");
+    CentroDistribucion* centro = sistema->buscarCentro(codigo);
+    if (centro == nullptr) cout << "Centro no encontrado." << endl;
+    return centro;
+}
+
+Colaborador* Menu::seleccionarColaborador(CentroDistribucion* centro) const {
+    if (centro == nullptr) return nullptr;
+    string identificacion = leerTexto("Identificacion del colaborador: ");
+    Nodo<Colaborador>* nodo = centro->getColaboradores().getPrimero();
+    while (nodo != nullptr) {
+        if (nodo->getDato()->getIdentificacion() == identificacion) return nodo->getDato();
+        nodo = nodo->getSiguiente();
+    }
+    cout << "Colaborador no encontrado." << endl;
+    return nullptr;
+}
+
+void Menu::pausar() const {
+    cout << "Presione ENTER para continuar..." << endl;
+    cin.ignore(10000, '\n');
+    cin.get();
+}
+
+void Menu::mostrarTitulo() const {
+    cout << "========================================" << endl;
+    cout << "             TicoPack                  " << endl;
+    cout << "========================================" << endl;
+}
+
+void Menu::mostrarOpciones() const {
+    cout << "1. Centros de distribucion" << endl;
+    cout << "2. Clientes" << endl;
+    cout << "3. Colaboradores" << endl;
+    cout << "4. Bodegas y matrices" << endl;
+    cout << "5. Paquetes, almacenamiento y reubicacion" << endl;
+    cout << "6. Solicitudes de envio" << endl;
+    cout << "7. Despachos" << endl;
+    cout << "8. Reportes" << endl;
+    cout << "0. Salir" << endl;
+}
+
+void Menu::menuCentros() {
+    limpiarPantalla();
+    int opcion;
+    do {
+        cout << "\nCENTROS\n1 Registrar\n2 Buscar\n3 Mostrar todos\n4 Eliminar\n0 Regresar\n";
+        opcion = leerEntero("Opcion: ");
+        if (opcion == 1) {
+            string codigo = leerTexto("Codigo: ");
+            if (sistema->buscarCentro(codigo) != nullptr) { cout << "Codigo duplicado." << endl; continue; }
+            CentroDistribucion* centro = new CentroDistribucion(codigo,
+                leerTexto("Nombre: "), leerTexto("Provincia: "),
+                leerTexto("Direccion: "), leerTexto("Telefono: "));
+            if (!sistema->agregarCentro(centro)) delete centro;
+        }
+        else if (opcion == 2) { CentroDistribucion* c = seleccionarCentro(); if (c != nullptr) c->mostrar(); }
+        else if (opcion == 3) sistema->mostrarEstado();
+        else if (opcion == 4) {
+            string codigo = leerTexto("Codigo del centro: ");
+            cout << (sistema->eliminarCentro(codigo) ? "Centro eliminado." : "No se puede eliminar el centro.") << endl;
+        }
+    if (opcion != 0) confirmarAccion("Accion procesada.");
+    } while (opcion != 0);
+    limpiarPantalla();
+}
+
+void Menu::menuClientes() {
+    limpiarPantalla();
+    CentroDistribucion* centro = seleccionarCentro();
+    if (centro == nullptr) return;
+    int opcion;
+    do {
+        cout << "\nCLIENTES\n1 Registrar persona fisica\n2 Registrar empresa\n3 Buscar\n4 Mostrar\n5 Eliminar\n0 Regresar\n";
+        opcion = leerEntero("Opcion: ");
+        if (opcion == 1 || opcion == 2) {
+            string id = leerTexto("Identificacion: ");
+            if (centro->buscarCliente(id) != nullptr) { cout << "Identificacion duplicada." << endl; continue; }
+            string nombre = leerTexto("Nombre: ");
+            string telefono = leerTexto("Telefono: ");
+            string correo = leerTexto("Correo: ");
+            if (!Validador::correoValido(correo)) { cout << "Correo invalido." << endl; continue; }
+            Cliente* cliente;
+            if (opcion == 1) cliente = new PersonaFisica(id, nombre, telefono, correo);
+            else {
+                string actividad = leerTexto("Actividad economica: ");
+                double descuento = leerDecimal("Descuento (0-100): ");
+                if (!Empresa::esPorcentajeValido(descuento)) { cout << "Descuento invalido." << endl; continue; }
+                cliente = new Empresa(id, nombre, telefono, correo, actividad, descuento);
+            }
+            if (!centro->agregarCliente(cliente)) delete cliente;
+        }
+        else if (opcion == 3) { Cliente* c = centro->buscarCliente(leerTexto("Identificacion: ")); if (c != nullptr) c->mostrar(); }
+        else if (opcion == 4) for (Nodo<Cliente>* n = centro->getClientes().getPrimero(); n != nullptr; n = n->getSiguiente()) n->getDato()->mostrar();
+        else if (opcion == 5) cout << (centro->eliminarCliente(leerTexto("Identificacion: ")) ? "Cliente eliminado." : "No se puede eliminar.") << endl;
+    if (opcion != 0) confirmarAccion("Accion procesada.");
+    } while (opcion != 0);
+    limpiarPantalla();
+}
+
+void Menu::menuColaboradores() {
+    limpiarPantalla();
+    CentroDistribucion* centro = seleccionarCentro();
+    if (centro == nullptr) return;
+    int opcion;
+    do {
+        cout << "\nCOLABORADORES\n1 Registrar\n2 Buscar\n3 Mostrar\n4 Eliminar\n0 Regresar\n";
+        opcion = leerEntero("Opcion: ");
+        if (opcion == 1) {
+            string id = leerTexto("Identificacion: ");
+            if (centro->buscarColaborador(id) != nullptr) { cout << "Identificacion duplicada." << endl; continue; }
+            Colaborador* c = new Colaborador(id, leerTexto("Nombre completo: "),
+                leerFecha("Fecha de ingreso"), leerTexto("Puesto: "));
+            if (!centro->agregarColaborador(c)) delete c;
+        }
+        else if (opcion == 2) { Colaborador* c = seleccionarColaborador(centro); if (c != nullptr) c->mostrar(); }
+        else if (opcion == 3) for (Nodo<Colaborador>* n = centro->getColaboradores().getPrimero(); n != nullptr; n = n->getSiguiente()) n->getDato()->mostrar();
+        else if (opcion == 4) cout << (centro->eliminarColaborador(leerTexto("Identificacion: ")) ? "Colaborador eliminado." : "No se puede eliminar.") << endl;
+    if (opcion != 0) confirmarAccion("Accion procesada.");
+    } while (opcion != 0);
+    limpiarPantalla();
+}
+
+void Menu::menuBodegas() {
+    limpiarPantalla();
+    CentroDistribucion* centro = seleccionarCentro();
+    if (centro == nullptr) return;
+    int opcion;
+    do {
+        cout << "\nBODEGAS\n1 Registrar\n2 Buscar\n3 Mostrar matriz\n4 Eliminar\n0 Regresar\n";
+        opcion = leerEntero("Opcion: ");
+        if (opcion == 1) {
+            string codigo = leerTexto("Codigo: ");
+            int tipo = leerEntero("Tipo (1 General, 2 Fragil, 3 Tecnologia, 4 Documentos): ");
+            int filas = leerEntero("Filas: ");
+            int columnas = leerEntero("Columnas: ");
+            if (centro->buscarBodega(codigo) != nullptr || !TipoBodega::esValido(tipo) || !Bodega::esDistribucionValida(filas, columnas)) { cout << "Datos invalidos o duplicados." << endl; continue; }
+            Bodega* b = new Bodega(codigo, leerTexto("Nombre: "), tipo, filas, columnas);
+            if (!centro->agregarBodega(b)) delete b;
+        }
+        else if (opcion == 2) { Bodega* b = centro->buscarBodega(leerTexto("Codigo: ")); if (b != nullptr) b->mostrarDatos(); }
+        else if (opcion == 3) { Bodega* b = centro->buscarBodega(leerTexto("Codigo: ")); if (b != nullptr) b->mostrarMatriz(true); }
+        else if (opcion == 4) cout << (centro->eliminarBodega(leerTexto("Codigo: ")) ? "Bodega eliminada." : "No se puede eliminar.") << endl;
+    if (opcion != 0) confirmarAccion("Accion procesada.");
+    } while (opcion != 0);
+    limpiarPantalla();
+}
+
+void Menu::menuPaquetes() {
+    limpiarPantalla();
+    CentroDistribucion* centro = seleccionarCentro();
+    if (centro == nullptr) return;
+    int opcion;
+    do {
+        cout << "\nPAQUETES\n1 Registrar\n2 Buscar\n3 Almacenar\n4 Reubicar\n5 Mostrar\n6 Eliminar\n0 Regresar\n";
+        opcion = leerEntero("Opcion: ");
+        if (opcion == 1) {
+            string codigo = leerTexto("Codigo: ");
+            if (centro->buscarPaquete(codigo) != nullptr) { cout << "Codigo duplicado." << endl; continue; }
+            Cliente* cliente = centro->buscarCliente(leerTexto("Identificacion del propietario: "));
+            int categoria = leerEntero("Categoria (1 General, 2 Fragil, 3 Tecnologia, 4 Documentos): ");
+            if (cliente == nullptr || !Categoria::esValida(categoria)) { cout << "Datos invalidos." << endl; continue; }
+            Paquete* p = new Paquete(codigo, leerTexto("Descripcion: "), leerDecimal("Peso: "), categoria, cliente);
+            if (!Paquete::datosValidos(p->getCodigo(), p->getDescripcion(), p->getPeso()) || !centro->agregarPaquete(p)) delete p;
+        }
+        else if (opcion == 2) { Paquete* p = centro->buscarPaquete(leerTexto("Codigo: ")); if (p != nullptr) p->mostrar(); }
+        else if (opcion == 3) {
+            Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete: ")); Bodega* b = centro->buscarBodega(leerTexto("Codigo de bodega: ")); Colaborador* c = seleccionarColaborador(centro);
+            if (p != nullptr && b != nullptr && c != nullptr) cout << (centro->almacenarPaquete(p, b, c, leerFecha("Fecha de almacenamiento")) ? "Paquete almacenado." : "No se pudo almacenar.") << endl;
+        }
+        else if (opcion == 4) {
+            Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete: ")); Bodega* b = centro->buscarBodega(leerTexto("Codigo de bodega destino: ")); int f = leerEntero("Fila destino: "); int col = leerEntero("Columna destino: ");
+            cout << (centro->reubicarPaquete(p, b, f, col) ? "Paquete reubicado." : "No se pudo reubicar.") << endl;
+        }
+        else if (opcion == 5) for (Nodo<Paquete>* n = centro->getPaquetes().getPrimero(); n != nullptr; n = n->getSiguiente()) n->getDato()->mostrar();
+        else if (opcion == 6) cout << (centro->eliminarPaquete(leerTexto("Codigo: ")) ? "Paquete eliminado." : "No se puede eliminar.") << endl;
+    if (opcion != 0) confirmarAccion("Accion procesada.");
+    } while (opcion != 0);
+    limpiarPantalla();
+}
+
+void Menu::menuSolicitudes() {
+    limpiarPantalla();
+    CentroDistribucion* centro = seleccionarCentro();
+    if (centro == nullptr) return;
+    int opcion;
+    do {
+        cout << "\nSOLICITUDES\n1 Crear\n2 Buscar\n3 Aprobar\n4 Rechazar\n5 Anular\n0 Regresar\n";
+        opcion = leerEntero("Opcion: ");
+        if (opcion == 1) {
+            Paquete* p = centro->buscarPaquete(leerTexto("Codigo del paquete: ")); Colaborador* c = seleccionarColaborador(centro);
+            if (p == nullptr || c == nullptr || p->getEstado() != EstadoPaquete::ALMACENADO) { cout << "El paquete debe estar almacenado." << endl; continue; }
+            Cliente* cliente = p->getPropietario();
+            string codigo = leerTexto("Codigo de solicitud: ");
+            if (centro->buscarSolicitud(codigo) != nullptr) { cout << "Codigo duplicado." << endl; continue; }
+            double costo = cliente->calcularCostoFinal(Tarifas::calcular(p->getPeso(), p->getCategoria(), 0));
+            SolicitudEnvio* s = new SolicitudEnvio(codigo, cliente, p, c, centro->getCodigo(), leerTexto("Destino: "), 0, leerFecha("Fecha de solicitud"), costo);
+            if (!centro->agregarSolicitud(s)) delete s;
+        }
+        else if (opcion == 2) { SolicitudEnvio* s = centro->buscarSolicitud(leerTexto("Codigo: ")); if (s != nullptr) s->mostrar(); }
+        else if (opcion == 3) { SolicitudEnvio* s = centro->buscarSolicitud(leerTexto("Codigo: ")); if (s != nullptr) cout << (centro->aprobarSolicitud(s, s->getResponsable(), leerFecha("Fecha de aprobacion")) ? "Aprobada." : "No se pudo aprobar.") << endl; }
+        else if (opcion == 4 || opcion == 5) { SolicitudEnvio* s = centro->buscarSolicitud(leerTexto("Codigo: ")); if (s != nullptr) cout << (s->cambiarEstado(opcion == 4 ? EstadoSolicitud::RECHAZADA : EstadoSolicitud::ANULADA) ? "Estado actualizado." : "No se pudo cambiar.") << endl; }
+    if (opcion != 0) confirmarAccion("Accion procesada.");
+    } while (opcion != 0);
+    limpiarPantalla();
+}
+
+void Menu::menuDespachos() {
+    limpiarPantalla();
+    CentroDistribucion* centro = seleccionarCentro();
+    if (centro == nullptr) return;
+    int opcion;
+    do {
+        cout << "\nDESPACHOS\n1 Buscar\n2 Mostrar todos\n3 Finalizar\n0 Regresar\n";
+        opcion = leerEntero("Opcion: ");
+        if (opcion == 1) { Despacho* d = centro->buscarDespacho(leerTexto("Codigo: ")); if (d != nullptr) d->mostrar(); }
+        else if (opcion == 2) for (Nodo<Despacho>* n = centro->getDespachos().getPrimero(); n != nullptr; n = n->getSiguiente()) n->getDato()->mostrar();
+        else if (opcion == 3) { Despacho* d = centro->buscarDespacho(leerTexto("Codigo: ")); Colaborador* c = seleccionarColaborador(centro); if (d != nullptr && c != nullptr) cout << (centro->finalizarDespacho(d, leerFecha("Fecha de finalizacion"), c) ? "Despacho finalizado." : "No se pudo finalizar.") << endl; }
+    if (opcion != 0) confirmarAccion("Accion procesada.");
+    } while (opcion != 0);
+    limpiarPantalla();
+}
+
+void Menu::menuReportes() {
+    limpiarPantalla();
+    CentroDistribucion* centro = seleccionarCentro();
+    if (centro == nullptr) return;
+    cout << "1 Historial cliente\n2 Clientes por envios\n3 Bitacora paquete\n4 Despacho paquete\n5 Ocupacion\n6 Despachos colaborador\n";
+    int opcion = leerEntero("Opcion: ");
+    if (opcion == 1) Reportes::historialCliente(*centro, centro->buscarCliente(leerTexto("Identificacion: ")));
+    else if (opcion == 2) Reportes::clientesPorEnvios(*centro);
+    else if (opcion == 3) Reportes::bitacoraPaquete(centro->buscarPaquete(leerTexto("Codigo de paquete: ")));
+    else if (opcion == 4) Reportes::despachoDePaquete(*centro, centro->buscarPaquete(leerTexto("Codigo de paquete: ")));
+    else if (opcion == 5) Reportes::ocupacionBodegas(*centro);
+    else if (opcion == 6) Reportes::despachosPorColaborador(*centro, seleccionarColaborador(centro));
+    pausar();
+    limpiarPantalla();
+}
+
+void Menu::ejecutar() {
+    if (sistema == nullptr) return;
+    int opcion;
+    do {
+        limpiarPantalla();
+        mostrarTitulo();
+        mostrarOpciones();
+        opcion = leerEntero("Seleccione una opcion: ");
+        if (opcion == 1) menuCentros();
+        else if (opcion == 2) menuClientes();
+        else if (opcion == 3) menuColaboradores();
+        else if (opcion == 4) menuBodegas();
+        else if (opcion == 5) menuPaquetes();
+        else if (opcion == 6) menuSolicitudes();
+        else if (opcion == 7) menuDespachos();
+        else if (opcion == 8) menuReportes();
+        else if (opcion != 0) cout << "Opcion invalida." << endl;
+        if (opcion != 0 && opcion != 1 && opcion != 2 && opcion != 3 &&
+            opcion != 4 && opcion != 5 && opcion != 6 && opcion != 7 && opcion != 8) {
+            pausar();
+        }
+    if (opcion != 0) confirmarAccion("Accion procesada.");
+    } while (opcion != 0);
+    limpiarPantalla();
+}

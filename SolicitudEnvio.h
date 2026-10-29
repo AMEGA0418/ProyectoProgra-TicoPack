@@ -5,6 +5,7 @@
 #include "EstadoSolicitud.h"
 #include "Cliente.h"
 #include "Paquete.h"
+#include "Colaborador.h"
 
 using namespace std;
 
@@ -13,6 +14,7 @@ private:
 	string codigo;
 	Cliente* cliente;
 	Paquete* paquete;
+	Colaborador* responsable;
 	string origen;
 	string destino;
 	int distancia;
@@ -24,10 +26,14 @@ public:
 	SolicitudEnvio(const string& codigo, Cliente* cliente, Paquete* paquete,
 		const string& origen, const string& destino, int distancia,
 		const Fecha& fechaSolicitud, double costo);
+	SolicitudEnvio(const string& codigo, Cliente* cliente, Paquete* paquete,
+		Colaborador* responsable, const string& origen, const string& destino,
+		int distancia, const Fecha& fechaSolicitud, double costo);
 
 	string getCodigo() const;
 	Cliente* getCliente() const;
 	Paquete* getPaquete() const;
+	Colaborador* getResponsable() const;
 	string getOrigen() const;
 	string getDestino() const;
 	int getDistancia() const;

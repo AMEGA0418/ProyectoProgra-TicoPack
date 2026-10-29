@@ -5,10 +5,99 @@ CentroDistribucion::CentroDistribucion(const string& codigo,
 	const string& nombre) {
 	this->codigo = codigo;
 	this->nombre = nombre;
+	this->provincia = "";
+	this->direccion = "";
+	this->telefono = "";
+}
+
+bool CentroDistribucion::eliminarBodega(const string& codigoBuscado) {
+	Bodega* bodega = buscarBodega(codigoBuscado);
+	if (bodega == nullptr || bodega->celdasOcupadas() != 0) return false;
+	return bodegas.eliminar(bodega);
+}
+
+bool CentroDistribucion::eliminarCliente(const string& identificacion) {
+	Cliente* cliente = buscarCliente(identificacion);
+	if (cliente == nullptr) return false;
+
+	for (Nodo<Paquete>* nodo = paquetes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getPropietario() == cliente) return false;
+	}
+	for (Nodo<SolicitudEnvio>* nodo = solicitudes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getCliente() == cliente) return false;
+	}
+	return clientes.eliminar(cliente);
+}
+
+bool CentroDistribucion::eliminarColaborador(const string& identificacion) {
+	Colaborador* colaborador = nullptr;
+	for (Nodo<Colaborador>* nodo = colaboradores.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getIdentificacion() == identificacion) {
+			colaborador = nodo->getDato();
+			break;
+		}
+	}
+	if (colaborador == nullptr) return false;
+
+	for (Nodo<SolicitudEnvio>* nodo = solicitudes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getResponsable() == colaborador) return false;
+	}
+	for (Nodo<Despacho>* nodo = despachos.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getResponsable() == colaborador) return false;
+	}
+	for (Nodo<Paquete>* nodo = paquetes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		for (Nodo<RegistroBitacora>* registro =
+			nodo->getDato()->getBitacora().getPrimero(); registro != nullptr;
+			registro = registro->getSiguiente()) {
+			if (registro->getDato()->getResponsable() == colaborador) return false;
+		}
+	}
+	return colaboradores.eliminar(colaborador);
+}
+
+bool CentroDistribucion::eliminarPaquete(const string& codigoBuscado) {
+	Paquete* paquete = buscarPaquete(codigoBuscado);
+	if (paquete == nullptr || paquete->getEstado() != EstadoPaquete::RECIBIDO ||
+		paquete->tieneUbicacion()) return false;
+
+	for (Nodo<SolicitudEnvio>* nodo = solicitudes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getPaquete() == paquete) return false;
+	}
+	for (Nodo<Despacho>* nodo = despachos.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->contienePaquete(paquete)) return false;
+	}
+	return paquetes.eliminar(paquete);
+}
+
+bool CentroDistribucion::tieneDependencias() const {
+	return !bodegas.estaVacia() || !clientes.estaVacia() ||
+		!colaboradores.estaVacia() || !paquetes.estaVacia() ||
+		!solicitudes.estaVacia() || !despachos.estaVacia();
+}
+
+CentroDistribucion::CentroDistribucion(const string& codigo,
+	const string& nombre, const string& provincia,
+	const string& direccion, const string& telefono) {
+	this->codigo = codigo;
+	this->nombre = nombre;
+	this->provincia = provincia;
+	this->direccion = direccion;
+	this->telefono = telefono;
 }
 
 string CentroDistribucion::getCodigo() const { return codigo; }
 string CentroDistribucion::getNombre() const { return nombre; }
+string CentroDistribucion::getProvincia() const { return provincia; }
+string CentroDistribucion::getDireccion() const { return direccion; }
+string CentroDistribucion::getTelefono() const { return telefono; }
 
 bool CentroDistribucion::agregarBodega(Bodega* bodega) {
 	if (bodega == nullptr || buscarBodega(bodega->getCodigo()) != nullptr) return false;
@@ -16,14 +105,41 @@ bool CentroDistribucion::agregarBodega(Bodega* bodega) {
 	return true;
 }
 
+bool CentroDistribucion::reubicarPaquete(Paquete* paquete, Bodega* destino,
+	int nuevaFila, int nuevaColumna) {
+	if (paquete == nullptr || destino == nullptr ||
+		paquete->getEstado() != EstadoPaquete::ALMACENADO ||
+		!paquete->tieneUbicacion() ||
+		!destino->esCompatible(paquete->getCategoria()) ||
+		destino->consultarCelda(nuevaFila, nuevaColumna) == nullptr ||
+		!destino->consultarCelda(nuevaFila, nuevaColumna)->estaLibre()) {
+		return false;
+	}
+
+	Bodega* origen = buscarBodega(paquete->getCodigoBodega());
+	if (origen == nullptr ||
+		origen->consultarCelda(paquete->getFila(), paquete->getColumna()) == nullptr ||
+		origen->consultarCelda(paquete->getFila(), paquete->getColumna())->getPaquete() != paquete) {
+		return false;
+	}
+
+	Celda* nuevaCelda = destino->consultarCelda(nuevaFila, nuevaColumna);
+	if (!destino->asignarPaquete(nuevaFila, nuevaColumna, paquete)) return false;
+
+	origen->liberarCelda(paquete->getFila(), paquete->getColumna());
+	paquete->asignarUbicacion(destino->getCodigo(), nuevaFila, nuevaColumna);
+	return nuevaCelda->getPaquete() == paquete;
+}
+
 bool CentroDistribucion::agregarCliente(Cliente* cliente) {
-	if (cliente == nullptr || buscarCliente(cliente->getIdentificacion()) != nullptr) return false;
+	if (cliente == nullptr || cliente->getIdentificacion().empty() ||
+		buscarCliente(cliente->getIdentificacion()) != nullptr) return false;
 	clientes.insertarFinal(cliente);
 	return true;
 }
 
 bool CentroDistribucion::agregarColaborador(Colaborador* colaborador) {
-	if (colaborador == nullptr) return false;
+	if (colaborador == nullptr || colaborador->getIdentificacion().empty()) return false;
 	for (Nodo<Colaborador>* nodo = colaboradores.getPrimero(); nodo != nullptr;
 		nodo = nodo->getSiguiente()) {
 		if (nodo->getDato()->getIdentificacion() == colaborador->getIdentificacion()) return false;
@@ -33,19 +149,49 @@ bool CentroDistribucion::agregarColaborador(Colaborador* colaborador) {
 }
 
 bool CentroDistribucion::agregarPaquete(Paquete* paquete) {
-	if (paquete == nullptr || buscarPaquete(paquete->getCodigo()) != nullptr) return false;
+	if (paquete == nullptr || paquete->getCodigo().empty() ||
+		paquete->getPropietario() == nullptr ||
+		buscarCliente(paquete->getPropietario()->getIdentificacion()) != paquete->getPropietario() ||
+		buscarPaquete(paquete->getCodigo()) != nullptr) return false;
 	paquetes.insertarFinal(paquete);
 	return true;
 }
 
 bool CentroDistribucion::agregarSolicitud(SolicitudEnvio* solicitud) {
-	if (solicitud == nullptr || buscarSolicitud(solicitud->getCodigo()) != nullptr) return false;
+	if (solicitud == nullptr || solicitud->getCodigo().empty() ||
+		buscarSolicitud(solicitud->getCodigo()) != nullptr ||
+		solicitud->getCliente() == nullptr || solicitud->getPaquete() == nullptr ||
+		solicitud->getResponsable() == nullptr ||
+		buscarCliente(solicitud->getCliente()->getIdentificacion()) != solicitud->getCliente() ||
+		buscarPaquete(solicitud->getPaquete()->getCodigo()) != solicitud->getPaquete() ||
+		buscarColaborador(solicitud->getResponsable()->getIdentificacion()) != solicitud->getResponsable() ||
+		solicitud->getCliente() != solicitud->getPaquete()->getPropietario() ||
+		solicitud->getPaquete()->getEstado() != EstadoPaquete::ALMACENADO) return false;
+
+	for (Nodo<SolicitudEnvio>* nodo = solicitudes.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getPaquete() == solicitud->getPaquete() &&
+			nodo->getDato()->getEstado() == EstadoSolicitud::PENDIENTE) return false;
+	}
 	solicitudes.insertarFinal(solicitud);
 	return true;
 }
 
 bool CentroDistribucion::agregarDespacho(Despacho* despacho) {
-	if (despacho == nullptr || buscarDespacho(despacho->getCodigo()) != nullptr) return false;
+	if (despacho == nullptr || despacho->getCodigo().empty() ||
+		buscarDespacho(despacho->getCodigo()) != nullptr ||
+		despacho->getSolicitud() == nullptr ||
+		buscarSolicitud(despacho->getSolicitud()->getCodigo()) != despacho->getSolicitud()) return false;
+
+	for (Nodo<Paquete>* paquete = despacho->getPaquetes().getPrimero();
+		paquete != nullptr; paquete = paquete->getSiguiente()) {
+		if (paquete->getDato() == nullptr ||
+			buscarPaquete(paquete->getDato()->getCodigo()) != paquete->getDato()) return false;
+		for (Nodo<Despacho>* existente = despachos.getPrimero(); existente != nullptr;
+			existente = existente->getSiguiente()) {
+			if (existente->getDato()->contienePaquete(paquete->getDato())) return false;
+		}
+	}
 	despachos.insertarFinal(despacho);
 	return true;
 }
@@ -54,6 +200,14 @@ Bodega* CentroDistribucion::buscarBodega(const string& codigoBuscado) const {
 	for (Nodo<Bodega>* nodo = bodegas.getPrimero(); nodo != nullptr;
 		nodo = nodo->getSiguiente()) {
 		if (nodo->getDato()->getCodigo() == codigoBuscado) return nodo->getDato();
+	}
+	return nullptr;
+}
+
+Colaborador* CentroDistribucion::buscarColaborador(const string& identificacion) const {
+	for (Nodo<Colaborador>* nodo = colaboradores.getPrimero(); nodo != nullptr;
+		nodo = nodo->getSiguiente()) {
+		if (nodo->getDato()->getIdentificacion() == identificacion) return nodo->getDato();
 	}
 	return nullptr;
 }
@@ -104,20 +258,56 @@ bool CentroDistribucion::almacenarPaquete(Paquete* paquete, Bodega* bodega,
 		!bodega->esCompatible(paquete->getCategoria())) return false;
 
 	Celda* celda = bodega->primeraCeldaLibre();
-	if (celda == nullptr || !paquete->aplicarTransicion(EstadoPaquete::ALMACENADO,
-		responsable, fecha)) return false;
+	if (celda == nullptr || !bodega->asignarPaquete(celda->getFila(),
+		celda->getColumna(), paquete)) return false;
 
-	if (!bodega->asignarPaquete(celda->getFila(), celda->getColumna(), paquete)) {
-		paquete->estado = EstadoPaquete::RECIBIDO;
+	if (!paquete->aplicarTransicion(EstadoPaquete::ALMACENADO,
+		responsable, fecha)) {
+		bodega->liberarCelda(celda->getFila(), celda->getColumna());
 		return false;
 	}
-	paquete->asignarUbicacion(bodega, celda->getFila(), celda->getColumna());
+	paquete->asignarUbicacion(bodega->getCodigo(), celda->getFila(),
+		celda->getColumna());
 	return true;
 }
 
 bool CentroDistribucion::aprobarSolicitud(SolicitudEnvio* solicitud) {
-	if (solicitud == nullptr) return false;
-	return solicitud->cambiarEstado(EstadoSolicitud::APROBADA);
+	// La aprobacion completa requiere responsable y fecha.
+	return false;
+}
+
+bool CentroDistribucion::aprobarSolicitud(SolicitudEnvio* solicitud,
+	Colaborador* responsable, const Fecha& fecha) {
+	if (solicitud == nullptr || responsable == nullptr || !fecha.esValida() ||
+		solicitud->getEstado() != EstadoSolicitud::PENDIENTE ||
+		solicitud->getPaquete() == nullptr ||
+		solicitud->getCliente() != solicitud->getPaquete()->getPropietario() ||
+		solicitud->getPaquete()->getEstado() != EstadoPaquete::ALMACENADO ||
+		buscarPaquete(solicitud->getPaquete()->getCodigo()) != solicitud->getPaquete()) {
+		return false;
+	}
+	if (solicitud->getResponsable() != nullptr &&
+		solicitud->getResponsable() != responsable) return false;
+	if (buscarDespacho(solicitud->getCodigo() + "-D") != nullptr) return false;
+
+	Paquete* paquete = solicitud->getPaquete();
+	Despacho* despacho = new Despacho(solicitud->getCodigo() + "-D",
+		solicitud, responsable, fecha);
+	if (!despacho->agregarPaquete(paquete)) {
+		delete despacho;
+		return false;
+	}
+
+	if (!paquete->aplicarTransicion(EstadoPaquete::EN_TRANSITO,
+		responsable, fecha) ||
+		!solicitud->cambiarEstado(EstadoSolicitud::APROBADA) ||
+		!agregarDespacho(despacho)) {
+		delete despacho;
+		return false;
+	}
+
+	paquete->liberarUbicacion();
+	return true;
 }
 
 bool CentroDistribucion::finalizarDespacho(Despacho* despacho,
@@ -127,8 +317,12 @@ bool CentroDistribucion::finalizarDespacho(Despacho* despacho,
 
 	for (Nodo<Paquete>* nodo = despacho->getPaquetes().getPrimero();
 		nodo != nullptr; nodo = nodo->getSiguiente()) {
-		if (!nodo->getDato()->aplicarTransicion(EstadoPaquete::EN_TRANSITO,
+		Paquete* paquete = nodo->getDato();
+		if (paquete == nullptr || paquete->getEstado() != EstadoPaquete::EN_TRANSITO ||
+			!paquete->aplicarTransicion(EstadoPaquete::ENTREGADO,
 			responsable, fecha)) return false;
+
+		paquete->liberarUbicacion();
 	}
 	return despacho->finalizar(fecha);
 }

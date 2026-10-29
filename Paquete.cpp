@@ -1,6 +1,4 @@
 #include "Paquete.h"
-#include "Bodega.h"
-#include "Celda.h"
 
 // true si el caracter es un espacio en blanco (espacio, tab, salto de linea, etc.)
 static bool esEspacio(char c) {
@@ -22,15 +20,14 @@ bool Paquete::datosValidos(const string& codigo, const string& descripcion,
 }
 
 Paquete::Paquete(const string& codigo, const string& descripcion, double peso,
-    int categoria, Cliente* propietario, CentroDistribucion* centro) {
+    int categoria, Cliente* propietario) {
     this->codigo = codigo;
     this->descripcion = descripcion;
     this->peso = peso;
     this->categoria = categoria;
     this->propietario = propietario;
-    this->centro = centro;
     estado = EstadoPaquete::RECIBIDO;
-    bodega = nullptr;
+    codigoBodega = "";
     fila = -1;
     columna = -1;
 }
@@ -41,13 +38,12 @@ double Paquete::getPeso() const { return peso; }
 int Paquete::getCategoria() const { return categoria; }
 int Paquete::getEstado() const { return estado; }
 Cliente* Paquete::getPropietario() const { return propietario; }
-CentroDistribucion* Paquete::getCentro() const { return centro; }
-Bodega* Paquete::getBodega() const { return bodega; }
+string Paquete::getCodigoBodega() const { return codigoBodega; }
 int Paquete::getFila() const { return fila; }
 int Paquete::getColumna() const { return columna; }
 
 bool Paquete::tieneUbicacion() const {
-    return bodega != nullptr;
+    return !codigoBodega.empty();
 }
 
 const ListaEnlazada<RegistroBitacora>& Paquete::getBitacora() const {
@@ -88,14 +84,14 @@ bool Paquete::aplicarTransicion(int nuevo, Colaborador* responsable,
     return true;
 }
 
-void Paquete::asignarUbicacion(Bodega* nuevaBodega, int nuevaFila, int nuevaColumna) {
-    bodega = nuevaBodega;
+void Paquete::asignarUbicacion(const string& nuevoCodigoBodega, int nuevaFila, int nuevaColumna) {
+    codigoBodega = nuevoCodigoBodega;
     fila = nuevaFila;
     columna = nuevaColumna;
 }
 
 void Paquete::liberarUbicacion() {
-    bodega = nullptr;
+    codigoBodega = "";
     fila = -1;
     columna = -1;
 }
@@ -131,11 +127,8 @@ void Paquete::mostrar() const {
     }
 
     if (tieneUbicacion()) {
-        Celda* celda = bodega->consultarCelda(fila, columna);
-        cout << "Ubicacion: bodega " << bodega->getCodigo();
-        if (celda != nullptr) {
-            cout << ", celda " << celda->getIdentificador();
-        }
+        cout << "Ubicacion: bodega " << codigoBodega
+            << ", fila " << fila << ", columna " << columna;
         cout << endl;
     }
     else {

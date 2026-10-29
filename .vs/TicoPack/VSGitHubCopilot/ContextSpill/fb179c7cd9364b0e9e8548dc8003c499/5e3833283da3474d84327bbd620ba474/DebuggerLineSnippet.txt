@@ -1,0 +1,284 @@
+﻿FileId: 5
+``` HTMLPage.htm
+340: mantiene sus propias listas enlazadas de clientes, colaboradores,
+341: paquetes y solicitudes de envío, además de listas enlazadas
+342: independientes para bodegas y despachos. 2. Clientes y herencia La
+343: empresa atiende dos tipos de clientes: persona física y empresa. Ambos
+344: comparten identificación, nombre, teléfono y correo electrónico. La
+345: identificación del cliente debe ser única dentro del centro de
+346: distribución al que pertenece. Para las empresas se debe registrar
+347: adicionalmente la actividad económica y el porcentaje de descuento
+348: Página 3
+349: Universidad Nacional
+350: 
+351: Facultad de Ciencias Exactas y Naturales
+352: 
+353: EIF - 201 Programación I, II ciclo 20 26
+354: ____________________________________________________________________________
+355: 
+356: 3
+357: 
+358: autorizado. El diseño deberá utilizar herencia para representar
+359: adecuadamente esta relación. 3. Colaboradores De cada colaborador se
+360: debe registrar identificación, nombre completo, fecha de ingreso y
+361: puesto. La identificación del colaborador debe ser única dentro del
+362: centro de distribución al que pertenece. Los colaboradores serán
+363: responsables de registrar cambios de estado y gestionar solicitudes de
+364: envío. 4. Bodegas y matriz de almacenamiento Cada centro puede tener
+365: varias bodegas. Una bodega posee un código propio, nombre, tipo y una
+366: distribución definida por cantidad de filas y columnas. El código propio
+367: de la bodega debe ser único dentro de su centro de distribución y es
+368: distinto del código numérico utilizado para identificar el tipo de
+369: bodega. La cantidad de filas y columnas deberá ser un número entero
+370: mayor que cero. Al crear una bodega, el programa debe reservar
+371: dinámicamente una matriz de celdas de almacenamiento.
+372: 
+373: Código de tipo Tipo de bodega 1 General 2 Frágil 3 Tecnología 4
+374: Documentos
+375: 
+376: Cada celda de la matriz antes mencionada se identifica mediante el
+377: código propio de la bodega y su posición dentro de la matriz. Los
+378: índices de filas y columnas iniciarán en 0; por ejemplo, si la bodega
+379: tiene código A, A-00 representa fila 0, columna 0 y A-12 representa fila
+380: 1, columna 2. La representación mostrada es ilustrativa; si se utilizan
+381: índices de dos o más dígitos, la interfaz deberá emplear un formato que
+382: permita distinguir claramente fila y columna. Cada celda debe indicar si
+383: está
+384: Página 4
+385: Universidad Nacional
+386: 
+387: Facultad de Ciencias Exactas y Naturales
+388: 
+389: EIF - 201 Programación I, II ciclo 20 26
+390: ____________________________________________________________________________
+391: 
+392: 4
+393: 
+394: disponible u ocupada y, cuando esté ocupada, deberá permitir consultar
+395: el paquete almacenado. Ejemplo de representación gráfica de una bodega:
+396: A-00 LIBRE A-01 PK101 A-02 LIBRE A-03 LIBRE A-04 LIBRE A-05 LIBRE A-10
+397: LIBRE A-11 LIBRE A-12 LIBRE A-13 PK208 A-14 LIBRE A-15 LIBRE A-20 LIBRE
+398: A-21 LIBRE A-22 PK315 A-23 LIBRE A-24 LIBRE A-25 LIBRE A-30 LIBRE A-31
+399: LIBRE A-32 LIBRE A-33 LIBRE A-34 LIBRE A-35 LIBRE A-40 LIBRE A-41 LIBRE
+400: A-42 LIBRE A-43 LIBRE A-44 PK401 A-45 LIBRE
+401: 
+402: La visualización anterior es únicamente ilustrativa. El programa deberá
+403: construir la vista según la cantidad real de filas y columnas definida
+404: por el usuario. 5. Paquetes Cada paquete debe registrar código único,
+405: descripción, peso, categoría, cliente propietario, centro de
+406: distribución y estado actual. El código del paquete debe ser único en
+407: todo el sistema, la descripción no puede estar vacía y el peso debe ser
+408: mayor que cero. El cliente propietario debe pertenecer al mismo centro
+409: de distribución en el que se registra el paquete. Cuando el paquete se
+410: encuentre almacenado, también deberá mantener la bodega y la posición
+411: que ocupa dentro de la matriz; mientras esté en estado Recibido y aún no
+412: haya sido almacenado, estos datos no tendrán una ubicación asignada. Las
+413: categorías permitidas son: General, Frágil, Tecnología y Documentos.
+414: Cada paquete tendrá un estado. El sistema debe validar que los cambios
+415: respeten la siguiente tabla. Cada cambio válido debe registrarse en una
+416: bitácora enlazada que pueda crecer dinámicamente.
+417: Página 5
+418: Universidad Nacional
+419: 
+420: Facultad de Ciencias Exactas y Naturales
+421: 
+422: EIF - 201 Programación I, II ciclo 20 26
+423: ____________________________________________________________________________
+424: 
+425: 5
+426: 
+427: Estado actual Recibido Almacenado En tránsito Entregado Incidencia
+428: Recibido Actual Sí No No Sí Almacenado No Actual Sí No Sí En tránsito No
+429: No Actual Sí Sí Entregado No No No Actual No Incidencia No Sí Sí No
+430: Actual
+431: 
+432: Cada registro de la bitácora debe almacenar: estado anterior, nuevo
+433: estado, fecha del cambio y colaborador responsable. El colaborador
+434: responsable deberá pertenecer al mismo centro de distribución del
+435: paquete. En los cambios producidos al aprobar una solicitud o finalizar
+436: un despacho se utilizará como responsable al colaborador asociado a esa
+437: operación. La bitácora de cada paquete deberá implementarse mediante una
+438: lista enlazada y sus registros no podrán eliminarse. La tabla anterior
+439: define las transiciones posibles, pero algunas solo pueden ejecutarse
+440: mediante la operación que las origina:\
+441: - Recibido → pasa a Almacenado se realiza únicamente al asignar una
+442:   celda - Almacenado → pasa a En tránsito se realiza únicamente al aprobar
+443:   una solicitud y crear su despacho - En tránsito → pasa a Entregado se
+444:   realiza únicamente al finalizar el despacho - Incidencia → El estado
+445:   Incidencia es temporal, si la incidencia ocurre mientras el paquete está
+446:   almacenado, la celda permanece asignada y, al resolverse, puede volver a
+447:   Almacenado; si ocurre durante un despacho En proceso, el paquete
+448:   permanece sin celda y, al resolverse, puede volver a En tránsito. Si la
+449:   Incidencia ocurre mientras el paquete se encuentra en estado Recibido,
+450:   permanecerá sin ubicación y, al resolverse, podrá almacenarse siguiendo
+451:   el procedimiento normal, cambiando a Almacenado. Un paquete en
+452:   Incidencia no puede aprobar una nueva solicitud ni finalizar una
+453:   entrega.
+454: Página 6
+455: Universidad Nacional
+456: 
+457: Facultad de Ciencias Exactas y Naturales
+458: 
+459: EIF - 201 Programación I, II ciclo 20 26
+460: ____________________________________________________________________________
+461: 
+462: 6
+463: 7. Ingreso, ubicación y reubicación de paquetes − Cuando un paquete
+464:    ingresa por primera vez, su estado inicial será Recibido y no tendrá
+465:    bodega ni celda asignada. Para almacenarlo, el sistema deberá buscar
+466:    únicamente bodegas compatibles con su categoría y mostrar sus celdas
+467:    disponibles. La compatibilidad será directa: General con General,
+468:    Frágil con Frágil, Tecnología con Tecnología y Documentos con
+469:    Documentos. La misma lógica de almacenamiento se aplicará cuando una
+470:    Incidencia ocurrida antes del despacho se resuelva y el paquete no
+471:    tenga celda asignada. Al asignar una celda, el estado deberá cambiar
+472:    a Almacenado y el cambio se registrará en la bitácora. Si no existe
+473:    una bodega compatible con espacio disponible, el sistema deberá
+474:    informarlo y no modificar el estado ni la ubicación del paquete.
+475: − El sistema deberá recomendar una celda de almacenamiento. Primero
+476: seleccionará, entre las bodegas compatibles, la que posea el mayor
+477: porcentaje de espacio disponible. El usuario podrá aceptar la
+478: recomendación o seleccionar otra celda disponible de una bodega
+479: compatible.
+480: 
+481: − El sistema debe permitir reubicar un paquete que se encuentre en
+482: estado Almacenado, ya sea dentro de la misma bodega o hacia otra bodega
+483: compatible del mismo centro. Antes de liberar la celda actual, el
+484: sistema deberá validar que la nueva celda exista, sea compatible y esté
+485: disponible. Solo después de validar el destino se liberará la celda
+486: anterior y se ocupará la nueva, manteniendo actualizada la ubicación del
+487: paquete. Si la operación no puede completarse, la ubicación original
+488: debe conservarse sin cambios.
+489: 
+490: − Un paquete que pase a estado En tránsito deberá liberar inmediatamente
+491: su celda de almacenamiento y dejar de tener bodega y posición asignadas.
+492: Esta transición solo podrá producirse al aprobar una solicitud o al
+493: resolver una Incidencia perteneciente a un despacho que ya se encuentre
+494: En proceso. Un paquete Entregado tampoco puede permanecer asignado a una
+495: celda.
+496: Página 7
+497: Universidad Nacional
+498: 
+499: Facultad de Ciencias Exactas y Naturales
+500: 
+501: EIF - 201 Programación I, II ciclo 20 26
+502: ____________________________________________________________________________
+503: 
+504: 7
+505: 8. Solicitudes de envío − Para cada nuevo paquete se requiere crear una
+506:    solicitud de envío. Solo podrá crearse para un paquete que se
+507:    encuentre en estado Almacenado. Cada solicitud debe tener código
+508:    único, cliente, paquete, colaborador responsable, centro de origen,
+509:    destino de entrega, fecha de solicitud, costo estimado y estado. El
+510:    código de la solicitud debe ser único en todo el sistema. El cliente
+511:    indicado debe ser el propietario del paquete; el centro de origen
+512:    debe ser el mismo centro donde se encuentra registrado el paquete; y
+513:    el colaborador responsable debe pertenecer a ese mismo centro. El
+514:    destino se registrará como una descripción o dirección de entrega y
+515:    no representa otro centro de distribución. Al crearse, toda
+516:    solicitud tendrá estado Pendiente. Desde Pendiente únicamente podrá
+517:    cambiar a Aprobada, Rechazada o Anulada; estos tres estados serán
+518:    finales y no podrán modificarse posteriormente. Para un mismo
+519:    paquete solo podrá existir una solicitud Pendiente a la vez. Si una
+520:    solicitud fue Rechazada o Anulada, podrá crearse una nueva siempre
+521:    que el paquete continúe Almacenado; después de existir una solicitud
+522:    Aprobada y su despacho asociado no se permitirán nuevas solicitudes
+523:    para ese paquete.
+524: − El costo base se calculará según el peso del paquete y la tarifa
+525: correspondiente a su categoría: costo = peso × tarifa por kilogramo
+526: 
+527: Las tarifas por kilogramo serán:
+528: − General ¢1.500 − Frágil ¢2.000 − Tecnología ¢2.500
+529: − Documentos ¢1.000.
+530: Página 8
+531: Universidad Nacional
+532: 
+533: Facultad de Ciencias Exactas y Naturales
+534: 
+535: EIF - 201 Programación I, II ciclo 20 26
+536: ____________________________________________________________________________
+537: 
+538: 8
+539: 
+540: Estas tarifas deberán almacenarse como datos compartidos de la
+541: aplicación (por ejemplo, mediante atributos static) o mediante otra
+542: solución equivalente coherente con los contenidos del curso; no deberán
+543: repetirse como valores escritos directamente dentro de cada cálculo. Si
+544: el cliente es una empresa, al costo base se le aplicará el porcentaje de
+545: descuento autorizado, el cual deberá encontrarse entre 0% y 100%. El
+546: cálculo será:
+547: costo final = costo base - (costo base × porcentaje de descuento / 100)
+548: 
+549: El costo estimado almacenado en la solicitud será este costo final. 9.
+550: Despachos Al aprobar una solicitud Pendiente, la solicitud conservará su
+551: estado Aprobada y el sistema deberá crear un despacho asociado. El
+552: despacho tendrá como mínimo: código único, solicitud asociada, paquete,
+553: cliente, colaborador responsable, centro de origen, destino, fecha de
+554: despacho, hora y estado. El código del despacho debe ser único en todo
+555: el sistema. Su estado inicial será En proceso. La aprobación únicamente
+556: será válida si la solicitud continúa Pendiente, el paquete se encuentra
+557: Almacenado y no existe otro despacho asociado a ese paquete. En ese
+558: momento, el paquete deberá cambiar a En tránsito, liberar su celda y
+559: registrar el cambio en la bitácora. Si durante el trayecto el paquete
+560: pasa a Incidencia, el despacho permanecerá En proceso. Cuando la
+561: incidencia se resuelva podrá regresar a En tránsito. Una entrega solo
+562: podrá finalizarse cuando el despacho esté En proceso y el paquete se
+563: encuentre En tránsito; entonces el despacho cambiará a Finalizado y el
+564: paquete pasará a Entregado. Cada solicitud Aprobada generará un único
+565: despacho y cada paquete podrá tener como máximo un despacho.
+566: Página 9
+567: Universidad Nacional
+568: 
+569: Facultad de Ciencias Exactas y Naturales
+570: 
+571: EIF - 201 Programación I, II ciclo 20 26
+572: ____________________________________________________________________________
+573: 
+574: 9
+575: 10. Listas enlazadas obligatorias No se permite reemplazarlas por
+576:     vector, list, map, array, deque ni otra estructura contenedora de la
+577:     STL, como mínimo se deben crear las siguientes colecciones deberán
+578:     implementarse mediante listas enlazadas dinámicas propias. − Lista
+579:     de centros de distribución. − Lista de bodegas por centro. − Lista
+580:     de clientes por centro. − Lista de colaboradores por centro. − Lista
+581:     de paquetes por centro. − Lista de solicitudes de envío por centro.
+582:     − Lista de despachos por centro. − Bitácora de estados de cada
+583:     paquete.
+584: 11. Matrices obligatorias Cada bodega debe poseer su propia matriz
+585:     dinámica de celdas. La cantidad de filas y columnas será definida
+586:     por el usuario al crear la bodega y ambas deberán ser mayores que
+587:     cero. La matriz debe permitir reservar memoria, consultar
+588:     posiciones, asignar paquetes, liberar posiciones, recorrer filas y
+589:     columnas, calcular ocupación y mostrarse gráficamente en consola.
+590: Para los cálculos se utilizarán las siguientes relaciones:
+591: total de celdas = filas × columnas
+592: 
+593: porcentaje de ocupación = (celdas ocupadas / total de celdas) × 100
+594: Página 10
+595: Universidad Nacional
+596: 
+597: Facultad de Ciencias Exactas y Naturales
+598: 
+599: EIF - 201 Programación I, II ciclo 20 26
+600: ____________________________________________________________________________
+601: 
+602: 10
+603: 
+604: porcentaje disponible = (celdas libres / total de celdas) × 100
+605: 12. Operaciones obligatorias y reglas de eliminación Todas las
+606:     funcionalidades indicadas a continuación deben estar disponibles
+607:     desde los menús del sistema. Las búsquedas se realizarán mediante
+608:     las claves definidas en el proyecto: centro por código; bodega por
+609:     código dentro de un centro; cliente y colaborador por identificación
+610:     dentro de un centro; y paquete, solicitud y despacho por su código
+611:     único global. La eliminación de información solo podrá realizarse
+612:     cuando no deje referencias inválidas ni datos dependientes sin
+613:     relación. • Centros de distribución: registrar, buscar, mostrar y
+614:     eliminar. Solo se podrá eliminar un centro que no tenga clientes,
+615:     colaboradores, bodegas, paquetes, solicitudes ni despachos
+616:     asociados. • Clientes: registrar, buscar, mostrar y eliminar. Solo
+617:     se podrá eliminar un cliente que no tenga paquetes, solicitudes ni
+618:     despachos asociados. • Colaboradores: registrar, buscar, mostrar y
+619:     eliminar. Solo se podrá eliminar un colaborador que no aparezca como
+620:     responsable en solicitudes, despachos o registros de bitácora. •
+```

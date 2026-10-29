@@ -11,9 +11,6 @@
 
 using namespace std;
 
-class CentroDistribucion;
-class Bodega;
-
 class Paquete {
 private:
     string codigo;
@@ -22,25 +19,21 @@ private:
     int categoria;      // valor de Categoria (1 a 4)
     int estado;         // valor de EstadoPaquete
     Cliente* propietario;
-    CentroDistribucion* centro;
-    Bodega* bodega;      // nullptr si no tiene ubicacion
+    string codigoBodega; // vacio si no tiene ubicacion
     int fila;            // -1 si no tiene ubicacion
     int columna;         // -1 si no tiene ubicacion
     ListaEnlazada<RegistroBitacora> bitacora;
 
-    // --- Operaciones que solo puede ejecutar CentroDistribucion ---
-    // (almacenar, reubicar, aprobar solicitud, finalizar despacho, resolver
-    // incidencias de despacho). Asi el menu no puede saltarse las reglas.
-    friend class CentroDistribucion;
-
+public:
     // Aplica un cambio de estado permitido por la tabla y lo registra en la
     // bitacora. NO valida las reglas propias de cada operacion (celda,
     // despacho, etc.): eso lo hace CentroDistribucion antes de llamarla.
     bool aplicarTransicion(int nuevo, Colaborador* responsable,
         const Fecha& fecha);
-    void asignarUbicacion(Bodega* bodega, int fila, int columna);
+    void asignarUbicacion(const string& codigoBodega, int fila, int columna);
     void liberarUbicacion();
 
+private:
     void registrarBitacora(int anterior, int nuevo,
         Colaborador* responsable, const Fecha& fecha);
 
@@ -51,7 +44,7 @@ public:
 
     // Estado inicial RECIBIDO, sin bodega ni celda.
     Paquete(const string& codigo, const string& descripcion, double peso,
-        int categoria, Cliente* propietario, CentroDistribucion* centro);
+        int categoria, Cliente* propietario);
 
     string getCodigo() const;
     string getDescripcion() const;
@@ -59,8 +52,7 @@ public:
     int getCategoria() const;
     int getEstado() const;
     Cliente* getPropietario() const;
-    CentroDistribucion* getCentro() const;
-    Bodega* getBodega() const;
+    string getCodigoBodega() const;
     int getFila() const;
     int getColumna() const;
     bool tieneUbicacion() const;

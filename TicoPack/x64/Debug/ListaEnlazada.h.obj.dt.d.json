@@ -3,7 +3,9 @@
     "Data": {
         "Source": "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\listaenlazada.h",
         "ProvidedModule": "",
-        "Includes": [],
+        "Includes": [
+            "c:\\users\\amega\\onedrive\\documentos\\github\\proyectoprogra-zonaactiva\\proyectoprogra-ticopack\\nodo.h"
+        ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []
     }

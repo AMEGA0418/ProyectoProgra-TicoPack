@@ -6,12 +6,14 @@
 #include "ListaEnlazada.h"
 #include "Paquete.h"
 #include "Colaborador.h"
+#include "SolicitudEnvio.h"
 
 using namespace std;
 
 class Despacho {
 private:
 	string codigo;
+	SolicitudEnvio* solicitud;
 	Colaborador* responsable;
 	Fecha fechaCreacion;
 	Fecha fechaFinalizacion;
@@ -21,8 +23,12 @@ private:
 public:
 	Despacho(const string& codigo, Colaborador* responsable,
 		const Fecha& fechaCreacion);
+	Despacho(const string& codigo, SolicitudEnvio* solicitud,
+		Colaborador* responsable, const Fecha& fechaCreacion);
+	~Despacho();
 
 	string getCodigo() const;
+	SolicitudEnvio* getSolicitud() const;
 	Colaborador* getResponsable() const;
 	Fecha getFechaCreacion() const;
 	Fecha getFechaFinalizacion() const;

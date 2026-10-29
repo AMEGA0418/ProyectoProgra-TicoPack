@@ -1,0 +1,51 @@
+﻿#include "Menu.h"
+
+Menu::Menu(SistemaTicoPack* sistema) {
+    this->sistema = sistema;
+}
+
+void Menu::mostrarTitulo() const {
+    cout << "========================================" << endl;
+    cout << "             TicoPack                  " << endl;
+    cout << "========================================" << endl;
+}
+
+void Menu::mostrarOpciones() const {
+    cout << "1. Mostrar estado del centro" << endl;
+    cout << "2. Reporte general" << endl;
+    cout << "3. Reporte de estados de paquetes" << endl;
+    cout << "4. Reporte de ocupacion de bodegas" << endl;
+    cout << "0. Salir" << endl;
+}
+
+void Menu::ejecutar() {
+    if (sistema == nullptr || sistema->getCentro() == nullptr) return;
+
+    int opcion = -1;
+    while (opcion != 0) {
+        mostrarTitulo();
+        mostrarOpciones();
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            opcion = -1;
+            cout << "Opcion invalida." << endl;
+            continue;
+        }
+
+        if (opcion == 1) sistema->mostrarEstado();
+        else if (opcion == 2) Reportes::resumenCentro(*sistema->getCentro());
+        else if (opcion == 3) Reportes::estadoPaquetes(*sistema->getCentro());
+        else if (opcion == 4) Reportes::ocupacionBodegas(*sistema->getCentro());
+        else if (opcion != 0) cout << "Opcion invalida." << endl;
+
+        if (opcion != 0) {
+            cout << "Presione ENTER para continuar..." << endl;
+            cin.ignore(10000, '\n');
+            cin.get();
+        }
+    }
+}

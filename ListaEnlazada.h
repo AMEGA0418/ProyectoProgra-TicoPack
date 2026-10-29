@@ -25,6 +25,20 @@ public:
         }
     }
 
+    // Elimina solo los nodos y conserva los objetos apuntados.
+    // Se utiliza para listas que mantienen referencias no propietarias.
+    void liberarNodosSinEliminarDatos() {
+        Nodo<T>* actual = primero;
+        while (actual != nullptr) {
+            Nodo<T>* temporal = actual;
+            actual = actual->getSiguiente();
+            delete temporal;
+        }
+        primero = nullptr;
+        ultimo = nullptr;
+        tamano = 0;
+    }
+
     // Evita copias accidentales (provocarian doble delete).
     ListaEnlazada(const ListaEnlazada&) = delete;
     ListaEnlazada& operator=(const ListaEnlazada&) = delete;

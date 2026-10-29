@@ -4,11 +4,27 @@ Despacho::Despacho(const string& codigo, Colaborador* responsable,
 	const Fecha& fechaCreacion) : fechaCreacion(fechaCreacion),
 	fechaFinalizacion(0, 0, 0) {
 	this->codigo = codigo;
+	this->solicitud = nullptr;
 	this->responsable = responsable;
 	estado = EstadoDespacho::EN_PROCESO;
 }
 
+Despacho::Despacho(const string& codigo, SolicitudEnvio* solicitud,
+	Colaborador* responsable, const Fecha& fechaCreacion) :
+	fechaCreacion(fechaCreacion), fechaFinalizacion(0, 0, 0) {
+	this->codigo = codigo;
+	this->solicitud = solicitud;
+	this->responsable = responsable;
+	estado = EstadoDespacho::EN_PROCESO;
+}
+
+Despacho::~Despacho() {
+	// Los paquetes pertenecen a CentroDistribucion, no al despacho.
+	paquetes.liberarNodosSinEliminarDatos();
+}
+
 string Despacho::getCodigo() const { return codigo; }
+SolicitudEnvio* Despacho::getSolicitud() const { return solicitud; }
 Colaborador* Despacho::getResponsable() const { return responsable; }
 Fecha Despacho::getFechaCreacion() const { return fechaCreacion; }
 Fecha Despacho::getFechaFinalizacion() const { return fechaFinalizacion; }
