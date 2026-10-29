@@ -32,6 +32,7 @@ private:
     void menuSolicitudes();
     void menuDespachos();
     void menuReportes();
+    void menuBusquedasGlobales();
 
 public:
     explicit Menu(SistemaTicoPack* sistema);
